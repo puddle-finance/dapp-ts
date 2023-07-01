@@ -1,0 +1,55 @@
+.popup-content {
+    margin: auto !important;
+    background: black !important;
+    width: 60% !important;
+    border: 1px solid #d7d7d7 !important;
+    text-align: center !important;
+    padding: 1% 1% !important;
+}
+
+.fontverylong {
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 3;
+    word-break: break-all;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    padding-top: 15px;
+}
+
+input {
+    outline-style: none;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-size: 16px;
+}
+
+input:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+}
+
+.btn {
+    background: #eb94d0;
+    background-image: linear-gradient(to bottom, #eb94d0, #2079b0);
+    border-radius: 28px;
+    font-family: Microsoft JhengHei;
+    color: chartreuse;
+    padding: 10px;
+    cursor: pointer;
+    width: 7vw;
+}
+
+/* 悬停样式 */
+.btn:hover {
+    background: #2079b0;
+    background-image: -webkit-linear-gradient(top, #2079b0, #eb94d0);
+    background-image: -moz-linear-gradient(top, #2079b0, #eb94d0);
+    background-image: -ms-linear-gradient(top, #2079b0, #eb94d0);
+    background-image: -o-linear-gradient(top, #2079b0, #eb94d0);
+    background-image: linear-gradient(to bottom, #2079b0, #eb94d0);
+    text-decoration: none;
+}

@@ -8,6 +8,8 @@ const PuddleStatistics = "0x8aa3ffdf10463e0b1349a2a01e25485d6abf5b97c95960960a26
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
 
+import {TransactionBlock} from "@mysten/sui.js";
+
 async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
     let reqdata = {
         "jsonrpc": "2.0",
@@ -166,30 +168,6 @@ async function getPuddleByWallet(axios, apiurl, walletAddress, structType) {
     return await axios.post(apiurl, reqdata);
 }
 
-export async function moveCall(axios, apiurl, walletAddress, functionName, type_args, args) {
-
-    let reqdata = {
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "unsafe_moveCall",
-        "params": [
-            walletAddress,
-            Puddle_Package_ID,
-            Puddle_Module,
-            functionName,
-            type_args,
-            args,
-            null,
-            Puddle_Gas_Budget,
-            null
-        ]
-    };
-
-    console.log("reqdata = " + JSON.stringify(reqdata));
-
-    console.log(await axios.post(apiurl, reqdata));
-}
-
 export function getYourFundItems(axios, apiurl, walletAddress) {
 
     getPuddleByWallet(axios, apiurl, walletAddress, PuddleCapType).then(response => {
@@ -291,23 +269,39 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress) {
     return puddleStatisticsObj;
 }
 
-export async function handleSignMsg(wallet, msg) {
-    try {
-        // convert string to Uint8Array 
-        let msgBytes = new TextEncoder().encode(msg)
+export function mergePuddleShares(wallet){
+    
+}
 
-        // call wallet's signMessage function
-        let result = await wallet.signMessage({
-            message: msgBytes
-        })
-        // verify signature with publicKey and SignedMessage (params are all included in result)
-        let verifyResult = wallet.verifySignedMessage(result)
-        if (!verifyResult) {
-            console.log('signMessage succeed, but verify signedMessage failed')
-        } else {
-            console.log('signMessage succeed, and verify signedMessage succeed!')
+async function handleSignTransaction(wallet, functionName, type_args, args) {
+
+    let tx = new TransactionBlock();
+
+    if (wallet.connected) {
+        let args_arr = null;
+        if (args != null && args.length > 0) {
+            args_arr = [];
+            args.forEach(arg => {
+                args_arr.push(tx.pure(arg));
+            });
         }
-    } catch (e) {
-        console.error('signMessage failed', e)
+
+        // call sui move smart contract
+        tx.moveCall({
+            target: `${Puddle_Package_ID}::${Puddle_Module}::${functionName}`,
+            typeArguments: type_args,
+            arguments: args_arr,
+        })
+
+        try {
+            // signature and Execute Transaction
+            const resData = await wallet.signAndExecuteTransactionBlock({
+                transactionBlock: tx,
+                options: { showEffects: true },
+            });
+            console.log('successfully!', resData);
+        } catch (e) {
+            console.error('failed', e);
+        }
     }
 }

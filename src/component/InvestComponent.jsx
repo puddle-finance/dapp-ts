@@ -6,8 +6,10 @@ import {
   ErrorCode,
   formatSUI,
   addressEllipsis,
-  useSuiProvider
+  useSuiProvider,
 } from "@suiet/wallet-kit";
+
+import {TransactionBlock} from "@mysten/sui.js";
 
 import { useState, useEffect, useRef } from 'react';
 
@@ -15,7 +17,6 @@ import {
   getYourFundItems,
   getYourInvestItems,
   getPuddleStatistics,
-  handleSignMsg,
 } from "../resources/sui_api.js";
 
 import axios from 'axios';
@@ -132,10 +133,9 @@ export default function WalletComponent() {
   }
 
   function getYourInvsetFunds() {
-    // getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
-    //   setYourInvestItem(resp);
-    // });
-    handleSignMsg(wallet, "aaaa");
+    getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
+      setYourInvestItem(resp);
+    });
   }
 
   const changePayAmount = (e) => {

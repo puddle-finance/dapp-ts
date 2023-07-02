@@ -23,6 +23,7 @@ input {
     border-radius: 3px;
     padding: 6px 10px;
     font-size: 16px;
+    width: 40%;
 }
 
 input:focus {
@@ -41,6 +42,7 @@ input:focus {
     padding: 10px;
     cursor: pointer;
     width: 7vw;
+    margin: 2%;
 }
 
 /* 悬停样式 */

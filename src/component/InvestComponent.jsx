@@ -9,7 +9,7 @@ import {
   useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import {TransactionBlock} from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 import { useState, useEffect, useRef } from 'react';
 
@@ -17,6 +17,9 @@ import {
   getYourFundItems,
   getYourInvestItems,
   getPuddleStatistics,
+  mergePuddleShares,
+  depositPuddleShares,
+  salePuddleShares,
 } from "../resources/sui_api.js";
 
 import axios from 'axios';
@@ -78,6 +81,14 @@ export default function WalletComponent() {
     padding: '2vh 0'
   }
 
+  const displayBlock = {
+    display: 'block'
+  }
+
+  const displayNone = {
+    display: 'none'
+  }
+
   function timestampChange(timestamp) {
     if (timestamp == 0) {
       return "N/A";
@@ -108,6 +119,7 @@ export default function WalletComponent() {
   const [yourInvestItem, setYourInvestItem] = useState(new Array());
   const [puddleStatistics, setPuddleStatistics] = useState(new Object());
   const [payAmount, setPayAmount] = useState(0);
+  const [payPrice, setPayPrice] = useState(0);
 
   useEffect(() => {
     if (wallet.connected) {
@@ -142,8 +154,55 @@ export default function WalletComponent() {
     setPayAmount(e.target.value);
   }
 
-  function modifyInvestAmount(e) {
+  const changePayPrice = (e) => {
+    setPayPrice(e.target.value);
+  }
 
+  function mergePuddleSharesFn(puddle) {
+    let coin_type = puddle.puddle.coin_type;
+    let shares_id = puddle.id;
+    let merge_id_arr = puddle.merge_id_arr;
+    mergePuddleShares(wallet, coin_type, shares_id, merge_id_arr);
+  }
+
+  function depositAmount(puddle) {
+    if (puddle.puddle){
+      puddle = puddle.puddle;
+    }
+    let coin_type = puddle.coin_type;
+    let coin_decimals = puddle.coin_decimals;
+    let puddle_id = puddle.id.id;
+    let amount = payAmount;
+
+    depositPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, amount, coin_decimals);
+  }
+
+  function saleAmount(puddle) {
+    let coin_type = puddle.puddle.coin_type;
+    let coin_decimals = puddle.puddle.coin_decimals;
+    let shares_id = puddle.id;
+    let puddle_id = puddle.puddle.id.id;
+    let shares = puddle.shares;
+    let amount = payAmount;
+    let price = payPrice;
+    if (Number(amount) > Number(shares) / Number(coin_decimals)) {
+      alert("Insufficient shares");
+    } else {
+      let same = (Number(amount) * Number(coin_decimals)) == Number(shares) ? true : false;
+      let real_amount = same ? Number(shares) : Number(shares) - (Number(amount) * Number(coin_decimals));
+      let real_price = Number(price) * Number(coin_decimals);
+      salePuddleShares(wallet, coin_type, puddle_id, shares_id, real_amount, same, real_price);
+    }
+  }
+
+  function showDepositAmount(id) {
+    document.getElementById(id + "_depositAmount").style.display = "block";
+    document.getElementById(id + "_saleAmount").style.display = "none";
+  }
+
+  function showSaleAmount(id) {
+    document.getElementById(id + "_depositAmount").style.display = "none";
+    document.getElementById(id + "_saleAmount").style.display = "block";
   }
 
   return (
@@ -183,7 +242,7 @@ export default function WalletComponent() {
             <Tr>
               <Th style={{ ...ThStyle, width: "30%" }} >Name</Th>
               <Th style={{ ...ThStyle, width: "50%" }} >Description</Th>
-              <Th style={{ ...ThStyle, width: "20%" }} >Invested</Th>
+              <Th style={{ ...ThStyle, width: "20%" }} >PuddleShares</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -191,8 +250,10 @@ export default function WalletComponent() {
               yourInvestItem?.map(puddle => {
                 return (
                   <Tr>
-                    <Td style={{ wordBreak: 'break-all' }}>
+                    <Td style={{ ...TdStyle, wordBreak: 'break-all' }}>
                       <Popup trigger={<a href="javascript:void(0)">{puddle?.puddle?.metadata.name}</a>}
+                        onOpen={() => [setPayAmount(0), setPayPrice(0)]}
+                        onClose={() => [setPayAmount(0), setPayPrice(0)]}
                         modal
                         nested
                         data-theme='dark'
@@ -247,8 +308,17 @@ export default function WalletComponent() {
                               <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                 <Thead>
                                   <Tr>
-                                    <Th style={{...ThStyle, width:'30%'}} >Invested</Th>
-                                    <Th style={{...ThStyle, width:'70%'}} >Deposit / Sale</Th>
+                                    <Th style={{ ...ThStyle, width: '30%' }} >PuddleShares</Th>
+                                    {
+                                      puddle.can_merge
+                                        ? <Th style={{ ...ThStyle, width: '30%' }} >Merge PuddleShares</Th>
+                                        : <Th style={displayNone} >Merge PuddleShares</Th>
+                                    }
+                                    <Th style={{ ...ThStyle, width: '40%' }} >
+                                      <button className="btn" onClick={() => showDepositAmount(puddle.puddle.id.id)}>Deposit</button>
+                                      /
+                                      <button className="btn" onClick={() => showSaleAmount(puddle.puddle.id.id)}>Sale</button>
+                                    </Th>
                                   </Tr>
                                 </Thead>
                                 <Tbody>
@@ -256,12 +326,35 @@ export default function WalletComponent() {
                                     <Td>
                                       <b style={{ color: 'cyan' }}>{Number(puddle?.shares) / Number(puddle?.puddle.coin_decimals) + " " + puddle?.puddle.coin_name}</b>
                                     </Td>
+                                    {
+                                      puddle.can_merge
+                                        ? <Td><button className="btn" onClick={() => mergePuddleSharesFn(puddle)}>Merge</button></Td>
+                                        : <Td style={displayNone} ></Td>
+                                    }
                                     <Td>
-                                      <input type="number" onChange={changePayAmount} value={payAmount} />
-                                      &nbsp;
-                                      <button className="btn">Deposit</button>
-                                      &nbsp;
-                                      <button className="btn">Sale</button>
+                                      <div id={puddle.puddle.id.id + "_depositAmount"} style={{ display: 'none' }}>
+                                        <div>
+                                          <p>Amount</p>
+                                          <input type="number" onChange={changePayAmount} value={payAmount} />
+                                        </div>
+                                        <button className="btn" onClick={() => depositAmount(puddle)}>Confirm</button>
+                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                      </div>
+
+                                      <div id={puddle.puddle.id.id + "_saleAmount"} style={{ display: 'none' }}>
+                                        <p>
+                                          <span>
+                                            <p>Amount</p>
+                                            <input type="number" onChange={changePayAmount} value={payAmount} />
+                                          </span>
+                                          <span>
+                                            <p>Price</p>
+                                            <input type="number" onChange={changePayPrice} value={payPrice} />
+                                          </span>
+                                        </p>
+                                        <button className="btn" onClick={() => saleAmount(puddle)}>Confirm</button>
+                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                      </div>
                                     </Td>
                                   </Tr>
                                 </Tbody>
@@ -298,17 +391,114 @@ export default function WalletComponent() {
                 if (!puddle?.isInvest) {
                   return (
                     <Tr>
-                      <Td style={TdStyle}>
+                      <Td style={{ ...TdStyle, wordBreak: 'break-all' }}>
                         <Popup trigger={<a href="javascript:void(0)">{puddle?.metadata.name}</a>}
+                          onOpen={() => [setPayAmount(0)]}
+                          onClose={() => [setPayAmount(0)]}
                           modal
                           nested
                           data-theme='dark'
                           position="right center">
-                          <div>Popup content here !!</div>
+                          {close => (
+                            <div>
+                              <div style={{ textAlign: "left" }}>
+                                <a style={{ cursor: "pointer" }}>
+                                  <Icon as={CloseIcon} className="close" onClick={close} />
+                                </a>
+                              </div>
+                              <div style={{ overflow: 'overlay' }}>
+                                <h1 style={{ color: 'gold' }}>Fund Detail</h1>
+                                <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
+                                  <Thead>
+                                    <Tr>
+                                      <Th style={ThStyle} >Fund Name</Th>
+                                      <Th style={ThStyle} >Total Supply</Th>
+                                      <Th style={ThStyle} >Max Supply</Th>
+                                      <Th style={ThStyle} >Fund Trader</Th>
+                                    </Tr>
+                                  </Thead>
+                                  <Tbody>
+                                    <Tr>
+                                      <Td >{puddle?.metadata.name}</Td>
+                                      <Td>{Number(puddle?.metadata.total_supply) / Number(puddle?.coin_decimals) + " " + puddle?.coin_name}</Td>
+                                      <Td >{Number(puddle?.metadata.max_supply) / Number(puddle?.coin_decimals) + " " + puddle?.coin_name}</Td>
+                                      <Td>
+                                        <a target="_black" href={suiexplor.replace("{id}", puddle?.metadata.trader).replace("{type}", "address")}>{addressEllipsis(puddle?.metadata.trader)}</a>
+                                      </Td>
+                                    </Tr>
+                                  </Tbody>
+                                </Table>
+                                <Table style={{ width: '100%' }}>
+                                  <Thead>
+                                    <Tr>
+                                      <Th style={ThStyle} >Description</Th>
+                                    </Tr>
+                                  </Thead>
+                                  <Tbody>
+                                    <Tr>
+                                      <Td style={{ width: "40%", wordBreak: 'break-all' }}>{puddle?.metadata.desc}</Td>
+                                    </Tr>
+                                  </Tbody>
+                                </Table>
+  
+                                <hr />
+  
+                                <h1 style={{ color: 'gold' }}>Invested Detail</h1>
+                                <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
+                                  <Thead>
+                                    <Tr>
+                                      {
+                                        puddle.can_merge
+                                          ? <Th style={{ ...ThStyle, width: '30%' }} >Merge PuddleShares</Th>
+                                          : <Th style={displayNone} >Merge PuddleShares</Th>
+                                      }
+                                      <Th style={{ ...ThStyle, width: '40%' }} >
+                                        <button className="btn" onClick={() => showDepositAmount(puddle.id.id)}>Deposit</button>
+                                      </Th>
+                                    </Tr>
+                                  </Thead>
+                                  <Tbody>
+                                    <Tr>
+                                      {
+                                        puddle.can_merge
+                                          ? <Td><button className="btn" onClick={() => mergePuddleSharesFn(puddle)}>Merge</button></Td>
+                                          : <Td style={displayNone} ></Td>
+                                      }
+                                      <Td>
+                                        <div id={puddle.id.id + "_depositAmount"} style={{ display: 'none' }}>
+                                          <div>
+                                            <p>Amount</p>
+                                            <input type="number" onChange={changePayAmount} value={payAmount} />
+                                          </div>
+                                          <button className="btn" onClick={() => depositAmount(puddle)}>Confirm</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                        </div>
+  
+                                        <div id={puddle.id.id + "_saleAmount"} style={{ display: 'none' }}>
+                                          <p>
+                                            <span>
+                                              <p>Amount</p>
+                                              <input type="number" onChange={changePayAmount} value={payAmount} />
+                                            </span>
+                                            <span>
+                                              <p>Price</p>
+                                              <input type="number" onChange={changePayPrice} value={payPrice} />
+                                            </span>
+                                          </p>
+                                          <button className="btn" onClick={() => saleAmount(puddle)}>Confirm</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                        </div>
+                                      </Td>
+                                    </Tr>
+                                  </Tbody>
+                                </Table>
+                              </div>
+                            </div>
+                          )}
                         </Popup>
                       </Td>
-                      <Td>{puddle?.metadata?.desc}</Td>
-                      <Td>{Number(puddle?.metadata?.total_supply) / puddle?.coin_decimals + " " + puddle?.coin_name}</Td>
+                      <Td className="fontverylong">{puddle.metadata.desc}</Td>
+                      <Td>{Number(puddle?.metadata?.total_supply) / puddle.coin_decimals + " " + puddle.coin_name}</Td>
                     </Tr>
                   )
                 }

@@ -1,14 +1,14 @@
-const Puddle_Package_ID = "0xc4761cc514d11dddf61f74cddb281de4cf4995dc381496768abffccf4824c723";
+const Puddle_Package_ID = "0xcf854206bd3aa29279857209bd3656ffdcd3b3df6e886d30e375749743d28fe8";
 const Puddle_Module = "puddle";
 const Puddle_Gas_Budget = "100000000";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShares";
-const PuddleStatistics = "0x8aa3ffdf10463e0b1349a2a01e25485d6abf5b97c95960960a2669dbda79a5e4";
+const PuddleStatistics = "0x33b5c5b0c6cf7bd8f70658e6ab4df4523fcdb5adaadd93d4268f451ddebae1ab";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
 
-import {TransactionBlock} from "@mysten/sui.js";
+import { TransactionBlock } from "@mysten/sui.js";
 
 async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
     let reqdata = {
@@ -135,7 +135,7 @@ async function getFieldObject(axios, apiurl, fieldId, type, value) {
     return tableMap;
 }
 
-async function getPuddleByWallet(axios, apiurl, walletAddress, structType) {
+async function getPuddleSharesByWallet(axios, apiurl, walletAddress, structType) {
 
     let reqdata = {
         "jsonrpc": "2.0",
@@ -187,7 +187,7 @@ export function getYourFundItems(axios, apiurl, walletAddress) {
 
 export async function getYourInvestItems(axios, apiurl, walletAddress) {
 
-    let response = await getPuddleByWallet(axios, apiurl, walletAddress, PuddleSharesType);
+    let response = await getPuddleSharesByWallet(axios, apiurl, walletAddress, PuddleSharesType);
     let puddleArr = new Array();
 
     let puddleMap = new Map();
@@ -201,12 +201,16 @@ export async function getYourInvestItems(axios, apiurl, walletAddress) {
                 if (puddleMap.get(rep.id.id)) {
                     puddleObj = puddleMap.get(rep.id.id);
                     puddleObj.shares = Number(puddleObj.shares) + Number(objContent.shares);
+                    puddleObj.can_merge = true;
+                    puddleObj.merge_id_arr.push(objContent.id.id);
                 } else {
                     puddleObj = new Object();
                     puddleObj.id = objContent.id.id;
                     puddleObj.owner = objContent.owner;
                     puddleObj.shares = objContent.shares;
                     puddleObj.puddle = rep;
+                    puddleObj.can_merge = false;
+                    puddleObj.merge_id_arr = [];
                 }
                 puddleMap.set(rep.id.id, puddleObj);
             });
@@ -214,6 +218,7 @@ export async function getYourInvestItems(axios, apiurl, walletAddress) {
     }
 
     for (let puddle of puddleMap.values()) {
+        puddle.proportion = (Number(puddle.shares) / Number(puddle.puddle.metadata.total_supply)).toFixed(4);
         puddleArr.push(puddle);
     }
 
@@ -269,39 +274,169 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress) {
     return puddleStatisticsObj;
 }
 
-export function mergePuddleShares(wallet){
-    
+export async function mergePuddleShares(wallet, coin_type, shares_id, merge_id_arr) {
+
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(coin_type);
+
+    let objects_arr = [];
+    merge_id_arr.forEach(merge_id => {
+        objects_arr.push(txObj.object(merge_id));
+    });
+
+    let args = [
+        txObj.pure(shares_id),
+        txObj.makeMoveVec({ objects: objects_arr }),
+    ];
+
+    handleSignTransaction(wallet, "merge_shares", txObj, type_args, args, true);
 }
 
-async function handleSignTransaction(wallet, functionName, type_args, args) {
+export async function depositPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, amount, coin_decimals) {
 
-    let tx = new TransactionBlock();
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(coin_type);
+
+    let coin_id = null;
+
+    let coinArr = await getCoinArr(axios, apiurl, wallet.account.address, coin_type);
+    if (coinArr == undefined || coinArr == null || coinArr.length == 0) {
+        alert("No Balance");
+        return null;
+    } else {
+
+        for (let i = 0; i < coinArr.length; i++) {
+            let coinObj = coinArr[i];
+            if (Number(coinObj.balance) / Number(coin_decimals) >= Number(amount)) {
+                coin_id = coinObj.coinObjectId;
+                break;
+            }
+        }
+    }
+
+    if (coin_id == null) {
+        alert("Insufficient Balance");
+        return null;
+    }
+
+    let args = [
+        txObj.object(puddle_id),
+        txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
+        txObj.object(coin_id),
+    ];
+
+    console.log(JSON.stringify(args));
+
+    handleSignTransaction(wallet, "mint", txObj, type_args, args, true);
+}
+
+export async function salePuddleShares(wallet, coin_type, puddle_id, shares_id, amount, same, price) {
+
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(coin_type);
+
+    let args = [];
+
+    if (!same) {
+
+        args = [
+            txObj.object(shares_id),
+            txObj.pure(BigInt(Number(amount))),
+        ];
+
+        console.log(JSON.stringify(args));
+
+        let isOK = await handleSignTransaction(wallet, "divide_shares", txObj, type_args, args, false);
+
+        if (isOK) {
+            txObj = new TransactionBlock();
+
+            args = [
+                txObj.object(puddle_id),
+                txObj.object(shares_id),
+                txObj.pure(BigInt(Number(price))),
+            ];
+
+            console.log(JSON.stringify(args));
+
+            handleSignTransaction(wallet, "sale_shares", txObj, type_args, args, true);
+        }
+    } else {
+        txObj = new TransactionBlock();
+
+        args = [
+            txObj.object(puddle_id),
+            txObj.object(shares_id),
+            txObj.pure(BigInt(Number(price))),
+        ];
+
+        console.log(JSON.stringify(args));
+
+        handleSignTransaction(wallet, "sale_shares", txObj, type_args, args, true);
+    }
+}
+
+async function handleSignTransaction(wallet, functionName, txObj, type_args, args, isReload) {
 
     if (wallet.connected) {
-        let args_arr = null;
-        if (args != null && args.length > 0) {
-            args_arr = [];
-            args.forEach(arg => {
-                args_arr.push(tx.pure(arg));
-            });
-        }
 
         // call sui move smart contract
-        tx.moveCall({
+        txObj.moveCall({
             target: `${Puddle_Package_ID}::${Puddle_Module}::${functionName}`,
             typeArguments: type_args,
-            arguments: args_arr,
+            arguments: args,
         })
 
         try {
             // signature and Execute Transaction
             const resData = await wallet.signAndExecuteTransactionBlock({
-                transactionBlock: tx,
+                transactionBlock: txObj,
                 options: { showEffects: true },
             });
             console.log('successfully!', resData);
+            if (isReload) {
+                window.location.reload();
+            } else {
+                return true;
+            }
         } catch (e) {
             console.error('failed', e);
         }
+    }
+}
+
+export async function getCoinArr(axios, apiurl, walletAddress, coin_type) {
+    let reqdata = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "suix_getCoins",
+        "params": [
+            walletAddress,
+            coin_type,
+            null,
+            null
+        ]
+    };
+
+    let response = await axios.post(apiurl, reqdata);
+    if (response.data.result.data) {
+        let coinArr = [];
+        for (let i = 0; i < response.data.result.data.length; i++) {
+            let coinObj = response.data.result.data[i];
+            // "coinType": "0x2::sui::SUI",
+            // "coinObjectId": "0x26200601446dcd1aa4ba7f9f087b0920ae812b81164dfd38929a607066c4239e",
+            // "version": "775546",
+            // "digest": "5N7qWhY88psn7KZ9FBBW4gAYuEVMRmzFezvdj7sRBapy",
+            // "balance": "4347719828",
+            // "previousTransaction": "Dwj4Hnxm3CP4EnFzRizykQdXgrfWF9cfXx662XAr5UKr"
+            coinArr.push(coinObj);
+        }
+        return coinArr;
     }
 }

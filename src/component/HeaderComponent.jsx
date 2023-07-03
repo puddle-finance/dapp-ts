@@ -1,4 +1,5 @@
 import { IdcardTwoTone, WalletTwoTone, InteractionTwoTone, GiftTwoTone, DollarTwoTone, BankTwoTone } from '@ant-design/icons';
+import {PiSwap} from 'react-icons/pi';
 import { Menu } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
@@ -70,6 +71,9 @@ export default function HeaderComponent() {
                 </Menu.Item>
                 <Menu.Item id="puddle" key="puddle" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
                     <Link to="puddle" style={fontSize}>Puddle</Link>
+                </Menu.Item>
+                <Menu.Item id="market" key="market" icon={<PiSwap style={fontSize} />} style={menuStyle}>
+                    <Link to="market" style={fontSize}>Market</Link>
                 </Menu.Item>
                 <li style={connectWallet}>
                     <ConnectButton />

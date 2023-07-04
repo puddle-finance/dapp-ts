@@ -57,8 +57,14 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
         getTableKeyValue(axios, apiurl, obj.holder_info.fields.holder_amount_table.fields.id.id).then(rep => {
             puddleObj.holder_info.holder_amount_table = rep;
         });
+        let item_arr = []
+        for (let i = 0 ; i <  obj.market_info.fields.items.length; i++){
+            await getItemById(axios, apiurl, obj.market_info.fields.items[i]).then(resp=>{
+                item_arr.push(resp);
+            })
+        }
         puddleObj.market_info = {
-            "items": obj.market_info.fields.items
+            "items": item_arr
         };
         getTableKeyValue(axios, apiurl, obj.market_info.fields.item_listing_table.fields.id.id).then(rep => {
             puddleObj.market_info.item_listing_table = rep;
@@ -184,6 +190,49 @@ export function getYourFundItems(axios, apiurl, walletAddress) {
         }
     });
 }
+
+ export async function getItemById(axios, apiurl, itemId) {
+    let reqdata = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "sui_getObject",
+        "params": [
+            itemId,
+            {
+                "showType": true,
+                "showOwner": true,
+                "showContent": true,
+                "showPreviousTransaction": false,
+                "showDisplay": false,
+                "showBcs": false,
+                "showStorageRebate": false
+            }
+        ]
+    };
+
+    let response = await axios.post(apiurl, reqdata);
+    let itemObj = new Object();
+    if (response.data.result.data) {
+
+        itemObj.coin_decimals = SUI_decimals;
+
+        let coin_type = response.data.result.data.type.split("<")[1].replace(">", "");
+        itemObj.coin_type = coin_type;
+        let coin_name = coin_type.split("::")[2];
+
+        let obj = response.data.result.data.content.fields;
+        itemObj.price = obj.price / itemObj.coin_decimals;
+        itemObj.id = obj.id;
+        itemObj.owner = obj.item?.fields?.owner;
+        itemObj.puddle_id = obj.item?.fields?.puddle_id;
+        itemObj.shares = obj.item?.fields?.shares / itemObj.coin_decimals;
+        itemObj.coin_name = coin_name;
+        
+        //console.log(itemObj);
+    }
+    return itemObj;
+}
+
 
 export async function getYourInvestItems(axios, apiurl, walletAddress) {
 

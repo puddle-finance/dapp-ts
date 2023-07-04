@@ -9,6 +9,7 @@ import {
     useSuiProvider,
   } from "@suiet/wallet-kit";
   
+  import {BiSearchAlt} from 'react-icons/bi';
   import {TransactionBlock} from "@mysten/sui.js";
   
   import { useState, useEffect, useRef } from 'react';
@@ -17,6 +18,7 @@ import {
     salePuddleShares,
     getYourInvestItems,
     getPuddleStatistics,
+    getItemById,
   } from "../resources/sui_api.js";
   
   import axios from 'axios';
@@ -41,6 +43,7 @@ import {
     Button,
     Alert,
     AlertIcon,
+    Input,
   } from '@chakra-ui/react';
   
   import { CloseIcon } from '@chakra-ui/icons'
@@ -89,6 +92,8 @@ export default function MarketComponent() {
     const [saleAmounts, setSaleAmounts] = useState(0);
     const [selectedPuddleId, setSelectedPuddleId] = useState('');
     const [salePrice, setSalePrice] = useState(0);
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [saleItems, setSaleItems] = useState(new Array());
 
     useEffect(() => {
     if (wallet.connected) {
@@ -113,13 +118,33 @@ export default function MarketComponent() {
     });
     }
 
+    function getItem(item_id){
+        getItemById(axios, apiurl, item_id).then(resp=>{
+            setSaleItem(resp);
+        })
+    }
+
     function getYourInvsetFunds() {
     getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
         setYourInvestItem(resp);
     });
     }
+    function getItems(item_ids){
+        let items_arr = new Array();
+        for(let i = 0 ; i < item_ids.length; i++){
+            getItemById(axios, apiurl, item_ids[i]).then(item=>{
+                items_arr.push(item)
+            })
+        }
+        setSaleItems(items_arr);
+    }
+
     function handleSelectAction(e){
         setSelectedPuddleId(e.target.value);
+    }
+
+    function handleSearchKeyword(e){
+        setSearchKeyword(e.target.value);
     }
 
     function saleShares(share) {
@@ -292,7 +317,6 @@ export default function MarketComponent() {
                                                             onClick={(e)=>{
                                                                 if (yourInvestItem.length > 0 ){
                                                                     let share = yourInvestItem.filter(sh=>sh.puddle.id.id == selectedPuddleId)[0];
-                                                                    console.log(share)
                                                                     saleShares(share);
                                                                 }
                                                             }}
@@ -312,12 +336,88 @@ export default function MarketComponent() {
                                 borderStyle={'solid'}
                                 overflow={'scroll'}
                                 >
-                                    <Center mt={'10px'}>
-                                        <ItemComponent />
+                                    <Center mt={'10px'} mb={'15px'}>
+                                        <Input
+                                            placeholder={'Puddle Name..'}
+                                            width={'400px'}
+                                            bg={'#dfdcd5'}
+                                            color={'black'}
+                                            value={searchKeyword}
+                                            onChange={(e)=> handleSearchKeyword(e)}
+                                        />
+                                        
+                                        <Button 
+                                           leftIcon={<BiSearchAlt />} 
+                                           colorScheme='teal' 
+                                           variant='solid'
+                                           bg='#fac7d3' 
+                                           borderRadius={'20px'}    
+                                           width={'100px'}
+                                           height={'40px'}  
+                                           ml={'5px'}   
+                                           color={'black'}         
+                                        >Search</Button>
+
                                     </Center>
-                                    <Center mt={'10px'}>
-                                        <ItemComponent />
-                                    </Center>
+                                    {
+                                        puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name == searchKeyword).map(puddle => {
+                                            return(
+                                            puddle.market_info.items?.map(item =>{
+                                                
+                                                return (
+                                                    <Center mb={'15px'}>
+                                                        <Card 
+                                                            borderRadius={'20px'}
+                                                            borderWidth={'1px'} 
+                                                            borderColor={'#b8d8e5'} 
+                                                            borderStyle={'solid'}
+                                                            bg={'#7D7DFF'}
+                                                            width={'90%'}>
+                                                            <CardBody>
+                                                                <Center>
+                                                                    <Flex>
+                                                                        {/*puddle name */}
+                                                                            <Text fontSize='25px' as='ins' >
+                                                                                {puddle.metadata.name}
+                                                                            </Text>
+
+                                                                            {/*puddle id*/}
+                                                                            <Tooltip 
+                                                                                label={`puddle id: ${puddle.id.id}`}
+                                                                                bg={'gray'}
+                                                                            >
+                                                                                <InfoOutlineIcon ml={'3px'} mt={'5px'}/>
+                                                                            </Tooltip>
+                                                                    </Flex>
+                                                                </Center>
+                                                                <Center>
+                                                                    <Flex mt={'10px'}>
+                                                                        <Text color={'#b8d8e5'} >Amount: </Text>
+                                                                        <Text ml={'20px'}>{item.shares} shares</Text>
+                                                                        
+                                                                    </Flex>
+                                                                </Center>
+                                                                <Center>
+                                                                    <Flex >
+                                                                        <Text color={'#b8d8e5'} >Price: </Text>
+                                                                        <Text ml={'20px'}>{item.price}</Text>
+                                                                        <Text ml={'10px'}>{item.coin_name} </Text>
+                                                                    </Flex>
+                                                                </Center>
+                                                                <Center>
+                                                                    <Flex >
+                                                                    <Button width={'150px'} height={'50px'} color={'black'} bg='#b8d8e5' variant='solid' borderRadius={'20px'} size={'lg'}  >Buy Shares</Button>
+                                                                    </Flex>
+                                                                </Center>
+
+                                                            </CardBody>
+                                                        </Card>
+                                                    </Center>
+                                                );
+                                            })        
+                                        
+                                        )}
+                                    )}
                             </Box>
                             {/*左下半邊的卡片 */}
                             <Box></Box>

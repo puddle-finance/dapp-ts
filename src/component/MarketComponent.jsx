@@ -14,7 +14,7 @@ import {
   import { useState, useEffect, useRef } from 'react';
   
   import {
-    getYourFundItems,
+    salePuddleShares,
     getYourInvestItems,
     getPuddleStatistics,
   } from "../resources/sui_api.js";
@@ -39,6 +39,8 @@ import {
     NumberIncrementStepper,
     NumberDecrementStepper,
     Button,
+    Alert,
+    AlertIcon,
   } from '@chakra-ui/react';
   
   import { CloseIcon } from '@chakra-ui/icons'
@@ -86,6 +88,7 @@ export default function MarketComponent() {
     const [payAmount, setPayAmount] = useState(0);
     const [saleAmounts, setSaleAmounts] = useState(0);
     const [selectedPuddleId, setSelectedPuddleId] = useState('');
+    const [salePrice, setSalePrice] = useState(0);
 
     useEffect(() => {
     if (wallet.connected) {
@@ -115,6 +118,32 @@ export default function MarketComponent() {
         setYourInvestItem(resp);
     });
     }
+    function handleSelectAction(e){
+        setSelectedPuddleId(e.target.value);
+    }
+
+    function saleShares(share) {
+        let coin_type = share?.puddle?.coin_type;
+        let coin_decimals = share?.puddle?.coin_decimals;
+        let shares_id = share?.id;
+        let puddle_id = share?.puddle?.id?.id;
+        let shares = share?.shares;
+        let price = salePrice;
+        if (Number(saleAmounts) > Number(shares) / Number(coin_decimals)) {
+          alert("Insufficient shares");
+        } else {
+          let same = (Number(saleAmounts) * Number(coin_decimals)) == Number(shares) ? true : false;
+          let real_amount = same ? Number(shares) : Number(shares) - (Number(saleAmounts) * Number(coin_decimals));
+          let real_price = Number(price) * Number(coin_decimals);
+          salePuddleShares(wallet, coin_type, puddle_id, shares_id, real_amount, same, real_price);
+        }
+      }
+
+    const resetInput = (share)=>{
+        
+    }
+
+    
 
     const changePayAmount = (e) => {
     setPayAmount(e.target.value);
@@ -162,6 +191,7 @@ export default function MarketComponent() {
                                             borderRadius={'20px'}
                                             bg={'#7D7DFF'}
                                             width={'90%'}
+                                            mb={'20px'}
                                             >
                                             <CardBody>
                                                 {/*Sale Form */}
@@ -177,22 +207,21 @@ export default function MarketComponent() {
                                                         width={'150px'} 
                                                         height={'35px'} 
                                                         value={selectedPuddleId}
-                                                        onChange={(e)=>setSelectedPuddleId(e.target.value)}>
+                                                        onChange={(e)=> handleSelectAction(e)}
+                                                        placeholder="Select Puddle...">
                                                         {yourInvestItem?.map(share => {
-                                                            console.log('123',selectedPuddleId)
-                                                            return (<option value={share?.puddle?.id} key={share?.puddle?.id}>{share?.puddle?.metadata.name}</option>);}
+                                                            return (<option value={share?.puddle?.id.id} key={share?.puddle?.id.id}>{share?.puddle?.metadata.name}</option>);}
                                                         )}
                                                     </Select>
                                                            
                                                 </Flex>
                                                 <Flex ml={'20px'}>  
                                                     <Text color={'#eeb8c6'}>Total Shares: </Text>    
-                                                    {yourInvestItem.length > 0 ? yourInvestItem.filter((shares=>{
-                                                        return shares?.puddle?.id == selectedPuddleId
-                                                    })).map(shares=>{
-                                                        console.log(shares)
-                                                        return (<Text fontColor="#eeb8c6"></Text>)
-                                                    }):(<Text color={'#eeb8c6'}>N/A</Text>)
+                                                    {yourInvestItem.length > 0 ? yourInvestItem.filter((share=>{
+                                                        return share?.puddle?.id.id == selectedPuddleId
+                                                    })).map(share=>{
+                                                        return (<Text fontColor="#eeb8c6"  ml={'20px'}>{share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}</Text>)
+                                                    }):(<Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>)
                                                     }
                                                 </Flex >
                                                 
@@ -200,7 +229,7 @@ export default function MarketComponent() {
                                                     <Text fontSize={'20px'}  mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
                                                         <b>Amounts: </b> 
                                                 </Text>
-                                                    <NumberInput maxW='100px' mr='2rem' value={saleAmounts} onChange={(val)=> setSaleAmounts(val)} >
+                                                    <NumberInput maxW='100px' mr='2rem' value={saleAmounts} onChange={(value)=> setSaleAmounts(value)} >
                                                         <NumberInputField bg={'#919fc6'}  size={'xs'}  borderRadius={'20px'} />
                                                             <NumberInputStepper height={"40%"} mr={'5px'}>
                                                                 <NumberIncrementStepper/>
@@ -210,13 +239,64 @@ export default function MarketComponent() {
                                                 </Flex>
                                                
                                                 <Flex ml={'20px'}>  
-                                                    <Text color={'#eeb8c6'}>Remain Shares: N/A</Text>    
+                                                    <Text color={'#eeb8c6'}>Remain Shares: </Text>    
+                                                    {yourInvestItem.length > 0?yourInvestItem?.filter((share=>{
+                                                        return share?.puddle?.id.id == selectedPuddleId
+                                                    })).map(share =>{
+                                                        if (saleAmounts > share.shares / share.puddle.coin_decimals ){
+                                                            return(
+                                                            <Alert status="warning" fontSize={'15px'}>
+                                                                <AlertIcon  color={'yellow'} mr={'5px'} width={'20px'} height={'20px'}/>
+                                                                Over Your Share Amounts!!
+                                                            </Alert>)
+                                                            
+                                                        }else{
+                                                            return (<Text color={'#eeb8c6'} ml={'20px'}>{share.shares / share.puddle.coin_decimals - saleAmounts} {share.puddle.coin_name}</Text>)
+                                                        }
+                                                        
+                                                    }): <Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>}
                                                 </Flex >
+                                                <Flex alignItems='center'>
+                                                    <Text fontSize={'20px'}  mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
+                                                        <b>Price: </b> 
+                                                </Text>
+                                                    <NumberInput maxW='100px'  ml ={'30px'} value={salePrice} onChange={(value)=> setSalePrice(value)} >
+                                                        <NumberInputField bg={'#919fc6'}  size={'xs'}  borderRadius={'20px'} />
+                                                            <NumberInputStepper height={"40%"} >
+                                                                <NumberIncrementStepper/>
+                                                                <NumberDecrementStepper />
+                                                            </NumberInputStepper>
+                                                    </NumberInput>
+                                                    
+                                                        {yourInvestItem.length > 0 ? yourInvestItem.filter((share=>{
+                                                            return share?.puddle?.id.id == selectedPuddleId
+                                                        })).map(share=>{
+                                                            return (<Text fontColor="#eeb8c6"  ml={'10px'}> {share.puddle.coin_name}</Text>)
+                                                        }):(<Text color={'#eeb8c6'} ml={'5px'}></Text>)
+                                                        }    
+                                                                                                
+                                                </Flex>
 
                                             
                                                 <Center mt={'10px'} mb={'10px'}>
                                                     <Flex>  
-                                                        <Button width={'150px'} height={'50px'} color={'black'} bg='#b8d8e5' variant='solid' borderRadius={'20px'} size={'lg'} mr={'40px'} >Confirm to Sale</Button>
+                                                        <Button 
+                                                            width={'150px'} 
+                                                            height={'50px'} 
+                                                            color={'black'} 
+                                                            bg='#b8d8e5' 
+                                                            variant='solid' 
+                                                            borderRadius={'20px'}
+                                                            size={'lg'} 
+                                                            mr={'40px'} 
+                                                            onClick={(e)=>{
+                                                                if (yourInvestItem.length > 0 ){
+                                                                    let share = yourInvestItem.filter(sh=>sh.puddle.id.id == selectedPuddleId)[0];
+                                                                    console.log(share)
+                                                                    saleShares(share);
+                                                                }
+                                                            }}
+                                                            >Confirm to Sale</Button>
                                                         <Button width={'150px'} height={'50px'} color={'black'} bg='#fac7d3' variant='solid' borderRadius={'20px'}  size={'lg'} ml={'40px'}>Reset</Button>
                                                     </Flex>
                                                 </Center>

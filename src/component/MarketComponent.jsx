@@ -85,6 +85,7 @@ export default function MarketComponent() {
     const [puddleStatistics, setPuddleStatistics] = useState(new Object());
     const [payAmount, setPayAmount] = useState(0);
     const [saleAmounts, setSaleAmounts] = useState(0);
+    const [selectedPuddleId, setSelectedPuddleId] = useState('');
 
     useEffect(() => {
     if (wallet.connected) {
@@ -168,14 +169,31 @@ export default function MarketComponent() {
                                                     <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
                                                         <b>Puddle: </b> 
                                                     </Text>
-                                                    <Select borderRadius={'20px'} bg='#919fc6' color='white' size='lg' width={'150px'} height={'35px'} >
-                                                        <option value='paul' >Paul's Puddle</option>
-                                                        <option value='ryan'>Ryan's Puddle</option>
-                                                        <option value='andrew'>Andrew'S Puddle</option>
+                                                    <Select 
+                                                        borderRadius={'20px'} 
+                                                        bg='#919fc6' 
+                                                        color='white' 
+                                                        size='lg' 
+                                                        width={'150px'} 
+                                                        height={'35px'} 
+                                                        value={selectedPuddleId}
+                                                        onChange={(e)=>setSelectedPuddleId(e.target.value)}>
+                                                        {yourInvestItem?.map(share => {
+                                                            console.log('123',selectedPuddleId)
+                                                            return (<option value={share?.puddle?.id} key={share?.puddle?.id}>{share?.puddle?.metadata.name}</option>);}
+                                                        )}
                                                     </Select>
+                                                           
                                                 </Flex>
                                                 <Flex ml={'20px'}>  
-                                                    <Text color={'#eeb8c6'}>Total Shares: N/A</Text>    
+                                                    <Text color={'#eeb8c6'}>Total Shares: </Text>    
+                                                    {yourInvestItem.length > 0 ? yourInvestItem.filter((shares=>{
+                                                        return shares?.puddle?.id == selectedPuddleId
+                                                    })).map(shares=>{
+                                                        console.log(shares)
+                                                        return (<Text fontColor="#eeb8c6"></Text>)
+                                                    }):(<Text color={'#eeb8c6'}>N/A</Text>)
+                                                    }
                                                 </Flex >
                                                 
                                                 <Flex alignItems='center'>

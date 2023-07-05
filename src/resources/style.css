@@ -17,7 +17,8 @@
     padding-top: 15px;
 }
 
-input {
+input,
+textarea {
     outline-style: none;
     border: 1px solid #ccc;
     border-radius: 3px;
@@ -26,7 +27,8 @@ input {
     width: 40%;
 }
 
-input:focus {
+input:focus,
+textarea:focus {
     border-color: #66afe9;
     outline: 0;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
@@ -54,4 +56,21 @@ input:focus {
     background-image: -o-linear-gradient(top, #2079b0, #eb94d0);
     background-image: linear-gradient(to bottom, #2079b0, #eb94d0);
     text-decoration: none;
+}
+
+.styled-select select {
+    background: transparent;
+    width: 268px;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    height: 34px;
+    -webkit-appearance: none;
+    /*for chrome*/
+}
+
+.styled-select {
+    width: 240px;
+    height: 34px;
+    overflow: hidden;
 }

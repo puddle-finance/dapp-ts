@@ -5,6 +5,7 @@ import AboutUsComponent from './component/AboutUsComponent';
 import InvestComponent from './component/InvestComponent';
 import HeaderComponent from './component/HeaderComponent';
 import PuddleComponent from './component/PuddleComponent';
+import TraderComponent from './component/TraderComponent';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -12,6 +13,7 @@ const router = createBrowserRouter(
       <Route index element={<AboutUsComponent />} />
       <Route path="invest" element={<InvestComponent />} />
       <Route path="puddle" element={<PuddleComponent />} />
+      <Route path="trader" element={<TraderComponent />} />
     </Route>
   )
 )

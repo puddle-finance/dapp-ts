@@ -71,6 +71,9 @@ export default function HeaderComponent() {
                 <Menu.Item id="puddle" key="puddle" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
                     <Link to="puddle" style={fontSize}>Puddle</Link>
                 </Menu.Item>
+                <Menu.Item id="trader" key="trader" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
+                    <Link to="trader" style={fontSize}>Trader</Link>
+                </Menu.Item>
                 <li style={connectWallet}>
                     <ConnectButton />
                 </li>

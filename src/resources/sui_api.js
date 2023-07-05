@@ -8,7 +8,7 @@ const PuddleStatistics = "0x33b5c5b0c6cf7bd8f70658e6ab4df4523fcdb5adaadd93d4268f
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
 
-import { TransactionBlock } from "@mysten/sui.js";
+import { TransactionBlock, Inputs } from "@mysten/sui.js";
 
 async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
     let reqdata = {
@@ -46,26 +46,30 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
         }
 
         let obj = response.data.result.data.content.fields;
+
         puddleObj.id = obj.id;
         puddleObj.balance = obj.balance;
         puddleObj.commission_percentage = obj.commission_percentage;
         puddleObj.state = obj.state.fields;
         puddleObj.metadata = obj.metadata.fields;
         puddleObj.holder_info = {
-            "holders": obj.holder_info.fields.holders
+            "holders": obj.holder_info.fields.holders,
+            "holders_count": obj.holder_info.fields.holders.length
         };
         getTableKeyValue(axios, apiurl, obj.holder_info.fields.holder_amount_table.fields.id.id).then(rep => {
             puddleObj.holder_info.holder_amount_table = rep;
         });
         puddleObj.market_info = {
-            "items": obj.market_info.fields.items
+            "items": obj.market_info.fields.items,
+            "items_count": obj.market_info.fields.items.length
         };
         getTableKeyValue(axios, apiurl, obj.market_info.fields.item_listing_table.fields.id.id).then(rep => {
             puddleObj.market_info.item_listing_table = rep;
         });
         puddleObj.investments = {
             "total_rewards": obj.investments.fields.total_rewards,
-            "invests": obj.investments.fields.invests
+            "invests": obj.investments.fields.invests,
+            "invests_count": obj.investments.fields.invests.length
         }
         getTableKeyValue(axios, apiurl, obj.investments.fields.cost_table.fields.id.id).then(rep => {
             puddleObj.investments.cost_table = rep;
@@ -168,21 +172,23 @@ async function getPuddleSharesByWallet(axios, apiurl, walletAddress, structType)
     return await axios.post(apiurl, reqdata);
 }
 
-export function getYourFundItems(axios, apiurl, walletAddress) {
+export async function getYourFundItems(axios, apiurl, walletAddress) {
 
-    getPuddleByWallet(axios, apiurl, walletAddress, PuddleCapType).then(response => {
-        if (response.data.result.data) {
-            let puddleArr = new Array();
-            response.data.result.data.forEach(obj => {
-                let objContent = obj.data.content.fields;
-                let puddleObj = new Object();
-                puddleObj.id = objContent.id.id;
-                puddleObj.puddle = getPuddleById(axios, apiurl, objContent.puddle_id, walletAddress);
-                puddleArr.push(puddleObj);
-            })
-            return puddleArr;
+    let puddleArr = new Array();
+    let response = await getPuddleSharesByWallet(axios, apiurl, walletAddress, PuddleCapType);
+    if (response.data.result.data) {
+        for (let i = 0; i < response.data.result.data.length; i++) {
+            let obj = response.data.result.data[i];
+            let objContent = obj.data.content.fields;
+            let puddleObj = new Object();
+            puddleObj.id = objContent.id.id;
+            await getPuddleById(axios, apiurl, objContent.puddle_id, walletAddress).then(rep => {
+                puddleObj.puddle = rep;
+            });
+            puddleArr.push(puddleObj);
         }
-    });
+        return puddleArr;
+    }
 }
 
 export async function getYourInvestItems(axios, apiurl, walletAddress) {
@@ -304,15 +310,20 @@ export async function depositPuddleShares(axios, apiurl, wallet, coin_type, pudd
     let coin_id = null;
 
     let coinArr = await getCoinArr(axios, apiurl, wallet.account.address, coin_type);
+
+    let coin_count = 0;
+    let coin_balance = 0;
+
     if (coinArr == undefined || coinArr == null || coinArr.length == 0) {
         alert("No Balance");
         return null;
     } else {
-
+        coin_count = coinArr.length;
         for (let i = 0; i < coinArr.length; i++) {
             let coinObj = coinArr[i];
             if (Number(coinObj.balance) / Number(coin_decimals) >= Number(amount)) {
                 coin_id = coinObj.coinObjectId;
+                coin_balance = coinObj.balance;
                 break;
             }
         }
@@ -328,6 +339,24 @@ export async function depositPuddleShares(axios, apiurl, wallet, coin_type, pudd
         txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
         txObj.object(coin_id),
     ];
+
+    // if (coin_count < 2) {
+    //     const [coins] = txObj.splitCoins(txObj.object(coin_id), [
+    //         txObj.pure(BigInt(Number(coin_balance) - (Number(amount) * Number(coin_decimals)))),
+    //     ])
+    //     txObj.transferObjects([coins], txObj.object(wallet.account.address));
+    //     args = [
+    //         txObj.object(puddle_id),
+    //         txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
+    //         txObj.object(coin_id),
+    //     ];
+    // }else {
+    //     args = [
+    //         txObj.object(puddle_id),
+    //         txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
+    //         txObj.object(coin_id),
+    //     ];
+    // }
 
     console.log(JSON.stringify(args));
 
@@ -439,4 +468,105 @@ export async function getCoinArr(axios, apiurl, walletAddress, coin_type) {
         }
         return coinArr;
     }
+}
+
+export async function createPuddle(wallet, coin_type, name, desc, commissionPercentage, trader, maxSupply) {
+
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(coin_type);
+
+    let coin_decimals = 0;
+    if (coin_type === "0x2::sui::SUI"){
+        coin_decimals = SUI_decimals;
+    }
+
+    let args = [
+        txObj.object(PuddleStatistics),
+        txObj.pure(BigInt(Number(maxSupply) * Number(coin_decimals))),
+        txObj.object(trader),
+        txObj.pure(Number(commissionPercentage)),
+        txObj.pure(name),
+        txObj.pure(desc),
+    ];
+
+    console.log(JSON.stringify(args));
+
+    handleSignTransaction(wallet, "create_puddle", txObj, type_args, args, true);
+}
+
+export async function modifyPuddle(wallet, puddle, coin_type, name, desc, commissionPercentage, trader) {
+
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(coin_type);
+
+    let coin_decimals = 0;
+    if (coin_type === "0x2::sui::SUI"){
+        coin_decimals = SUI_decimals;
+    }
+
+    txObj.moveCall({
+        target: `${Puddle_Package_ID}::${Puddle_Module}::modify_puddle_name`,
+        typeArguments: type_args,
+        arguments: [
+            txObj.object(puddle.id),
+            txObj.object(puddle.puddle.id.id),
+            txObj.pure(name),
+        ],
+    })
+
+    txObj.moveCall({
+        target: `${Puddle_Package_ID}::${Puddle_Module}::modify_puddle_desc`,
+        typeArguments: type_args,
+        arguments: [
+            txObj.object(puddle.id),
+            txObj.object(puddle.puddle.id.id),
+            txObj.pure(desc),
+        ],
+    })
+
+    txObj.moveCall({
+        target: `${Puddle_Package_ID}::${Puddle_Module}::modify_puddle_commission_percentage`,
+        typeArguments: type_args,
+        arguments: [
+            txObj.object(puddle.id),
+            txObj.object(puddle.puddle.id.id),
+            txObj.pure(commissionPercentage),
+        ],
+    })
+
+    txObj.moveCall({
+        target: `${Puddle_Package_ID}::${Puddle_Module}::modify_puddle_trader`,
+        typeArguments: type_args,
+        arguments: [
+            txObj.object(puddle.id),
+            txObj.object(puddle.puddle.id.id),
+            txObj.object(trader),
+        ],
+    })
+
+    let isReload = true;
+
+    try {
+        // signature and Execute Transaction
+        const resData = await wallet.signAndExecuteTransactionBlock({
+            transactionBlock: txObj,
+            options: { showEffects: true },
+        });
+        console.log('successfully!', resData);
+        if (isReload) {
+            window.location.reload();
+        } else {
+            return true;
+        }
+    } catch (e) {
+        console.error('failed', e);
+    }
+
+    // console.log(JSON.stringify(args));
+
+    // handleSignTransaction(wallet, "create_puddle", txObj, type_args, args, false);
 }

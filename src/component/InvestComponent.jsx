@@ -14,7 +14,6 @@ import { TransactionBlock } from "@mysten/sui.js";
 import { useState, useEffect, useRef } from 'react';
 
 import {
-  getYourFundItems,
   getYourInvestItems,
   getPuddleStatistics,
   mergePuddleShares,
@@ -131,7 +130,7 @@ export default function WalletComponent() {
         setSuiexplor(SUI_TESTNET_SUIEXPLOR_URL);
       } else {
         setApiurl(SUI_MAINNET_API_URL);
-        setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);
+        setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);getYourInvestItems
       }
       getYourInvsetFunds();
       getFundsData();
@@ -270,10 +269,10 @@ export default function WalletComponent() {
                               <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                 <Thead>
                                   <Tr>
-                                    <Th style={ThStyle} >Fund Name</Th>
+                                    <Th style={ThStyle} >Puddle Name</Th>
                                     <Th style={ThStyle} >Total Supply</Th>
                                     <Th style={ThStyle} >Max Supply</Th>
-                                    <Th style={ThStyle} >Fund Trader</Th>
+                                    <Th style={ThStyle} >Puddle Trader</Th>
                                     <Th style={ThStyle} >Proportion</Th>
                                   </Tr>
                                 </Thead>
@@ -316,8 +315,6 @@ export default function WalletComponent() {
                                     }
                                     <Th style={{ ...ThStyle, width: '40%' }} >
                                       <button className="btn" onClick={() => showDepositAmount(puddle.puddle.id.id)}>Deposit</button>
-                                      /
-                                      <button className="btn" onClick={() => showSaleAmount(puddle.puddle.id.id)}>Sale</button>
                                     </Th>
                                   </Tr>
                                 </Thead>

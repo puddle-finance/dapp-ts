@@ -66,12 +66,13 @@ export default function HeaderComponent() {
                 <Menu.Item id="about" key="about" icon={<IdcardTwoTone style={fontSize} />} style={menuStyle}>
                     <Link to="" style={fontSize}>About Us</Link>
                 </Menu.Item>
-                <Menu.Item id="invest" key="invest" icon={<DollarTwoTone style={fontSize} />} style={menuStyle}>
-                    <Link to="invest" style={fontSize}>Invest</Link>
-                </Menu.Item>
                 <Menu.Item id="puddle" key="puddle" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
                     <Link to="puddle" style={fontSize}>Puddle</Link>
                 </Menu.Item>
+                <Menu.Item id="invest" key="invest" icon={<DollarTwoTone style={fontSize} />} style={menuStyle}>
+                    <Link to="invest" style={fontSize}>Invest</Link>
+                </Menu.Item>
+                
                 <Menu.Item id="market" key="market" icon={<PiSwap style={fontSize} />} style={menuStyle}>
                     <Link to="market" style={fontSize}>Market</Link>
                 </Menu.Item>

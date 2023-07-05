@@ -9,5 +9,5 @@ export default defineConfig({
   define: {
 		'process.env': {},
 	},
-  proxy: "https://dapp-ts.vercel.app/"
+  proxy: "https://dapp-ts.vercel.app/ "
 })

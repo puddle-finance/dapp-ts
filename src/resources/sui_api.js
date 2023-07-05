@@ -353,7 +353,6 @@ export async function mergePuddleShares(wallet, coin_type, shares_id, merge_id_a
 export async function depositPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, amount, coin_decimals) {
 
     let txObj = new TransactionBlock();
-    txObj.splitCoins(txObj.gas, [txObj.pure(1000000)])
 
     let type_args = [];
     type_args.push(coin_type);

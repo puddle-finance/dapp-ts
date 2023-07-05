@@ -1,9 +1,9 @@
-const Puddle_Package_ID = "0x5659308e280c6e971bb369ba531d450afc326ce3f11d065a0e5ec733d9993ad0";
+const Puddle_Package_ID = "0x25ff841861accaf696526afde6203cc9df649f33173b24901823a548b7e44d44";
 const Puddle_Module = "puddle";
 const Puddle_Gas_Budget = "100000000";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShares";
-const PuddleStatistics = "0x424127c9a964c3d905cd544e8734b026cb058ebb5c79fe75e008d863dba0452c";
+const PuddleStatistics = "0x94e1c36e190c1265a954950ddd374f84a9f7ced3df29b9255b9e85d90c661826";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;

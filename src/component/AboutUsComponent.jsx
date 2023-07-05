@@ -1,4 +1,4 @@
-
+import { Image } from '@chakra-ui/react'
 
 export default function AboutUsComponent() {
   return (
@@ -26,7 +26,9 @@ export default function AboutUsComponent() {
         Therefore, this is why we are called “Puddle Finance”.
       </p>
 
-      <img src="../../src/resources/puddle_logo.jpg"></img>
+      <Image borderRadius='full'
+  src='https://i.imgur.com/id7Mdg4.jpeg'
+  />
 
     </div>
   );

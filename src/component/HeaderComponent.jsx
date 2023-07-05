@@ -3,6 +3,7 @@ import { Menu } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { ConnectButton } from "@suiet/wallet-kit";
+import {PiSwap} from 'react-icons/pi';
 
 export default function HeaderComponent() {
 
@@ -70,6 +71,9 @@ export default function HeaderComponent() {
                 </Menu.Item>
                 <Menu.Item id="puddle" key="puddle" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
                     <Link to="puddle" style={fontSize}>Puddle</Link>
+                </Menu.Item>
+                <Menu.Item id="market" key="market" icon={<PiSwap style={fontSize} />} style={menuStyle}>
+                    <Link to="market" style={fontSize}>Market</Link>
                 </Menu.Item>
                 <Menu.Item id="trader" key="trader" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
                     <Link to="trader" style={fontSize}>Trader</Link>

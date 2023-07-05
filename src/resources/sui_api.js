@@ -59,10 +59,18 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
         getTableKeyValue(axios, apiurl, obj.holder_info.fields.holder_amount_table.fields.id.id).then(rep => {
             puddleObj.holder_info.holder_amount_table = rep;
         });
+        
+        let item_arr = []
+        for (let i = 0 ; i <  obj.market_info.fields.items.length; i++){
+            await getItemById(axios, apiurl, obj.market_info.fields.items[i]).then(resp=>{
+                item_arr.push(resp);
+            })
+        }
         puddleObj.market_info = {
-            "items": obj.market_info.fields.items,
+            "items": item_arr,
             "items_count": obj.market_info.fields.items.length
         };
+        
         getTableKeyValue(axios, apiurl, obj.market_info.fields.item_listing_table.fields.id.id).then(rep => {
             puddleObj.market_info.item_listing_table = rep;
         });
@@ -82,6 +90,7 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
             }
         }
     }
+    console.log(puddleObj)
     return puddleObj;
 }
 
@@ -189,6 +198,47 @@ export async function getYourFundItems(axios, apiurl, walletAddress) {
         }
         return puddleArr;
     }
+}
+export async function getItemById(axios, apiurl, itemId) {
+    let reqdata = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "sui_getObject",
+        "params": [
+            itemId,
+            {
+                "showType": true,
+                "showOwner": true,
+                "showContent": true,
+                "showPreviousTransaction": false,
+                "showDisplay": false,
+                "showBcs": false,
+                "showStorageRebate": false
+            }
+        ]
+    };
+
+    let response = await axios.post(apiurl, reqdata);
+    let itemObj = new Object();
+    if (response.data.result.data) {
+
+        itemObj.coin_decimals = SUI_decimals;
+
+        let coin_type = response.data.result.data.type.split("<")[1].replace(">", "");
+        itemObj.coin_type = coin_type;
+        let coin_name = coin_type.split("::")[2];
+
+        let obj = response.data.result.data.content.fields;
+        itemObj.price = obj.price / itemObj.coin_decimals;
+        itemObj.id = obj.id;
+        itemObj.owner = obj.item?.fields?.owner;
+        itemObj.puddle_id = obj.item?.fields?.puddle_id;
+        itemObj.shares = obj.item?.fields?.shares / itemObj.coin_decimals;
+        itemObj.coin_name = coin_name;
+        
+        //console.log(itemObj);
+    }
+    return itemObj;
 }
 
 export async function getYourInvestItems(axios, apiurl, walletAddress) {
@@ -361,6 +411,56 @@ export async function depositPuddleShares(axios, apiurl, wallet, coin_type, pudd
     console.log(JSON.stringify(args));
 
     handleSignTransaction(wallet, "mint", txObj, type_args, args, true);
+}
+
+export async function buyPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, product_id, price, coin_decimals) {
+    console.log(coin_type);
+    console.log(puddle_id);
+    console.log(product_id);
+    console.log(price);
+    console.log(coin_decimals);
+
+    let txObj = new TransactionBlock();
+
+    txObj.setGasBudget(3000000);
+
+    let type_args = [];
+    type_args.push(coin_type);
+
+    let coin_id = null;
+
+    let coinArr = await getCoinArr(axios, apiurl, wallet.account.address, coin_type);
+    if (coinArr == undefined || coinArr == null || coinArr.length == 0) {
+        alert("No Balance");
+        return null;
+    } else {
+        
+
+        for (let i = 0; i < coinArr.length; i++) {
+            let coinObj = coinArr[i];
+            if (Number(coinObj.balance) / Number(coin_decimals) >= Number(price)) {
+                coin_id = coinObj.coinObjectId;
+                break;
+            }
+        }
+    }
+    console.log(coin_id);
+
+    if (coin_id == null) {
+        alert("Insufficient Balance");
+        return null;
+    }
+
+    let args = [
+        txObj.object(puddle_id),
+        txObj.object(product_id),
+        txObj.object(coin_id),
+    ];
+
+    console.log(JSON.stringify(args));
+
+    handleSignTransaction(wallet, "buy_shares", txObj, type_args, args, true);
+
 }
 
 export async function salePuddleShares(wallet, coin_type, puddle_id, shares_id, amount, same, price) {

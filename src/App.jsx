@@ -5,6 +5,7 @@ import AboutUsComponent from './component/AboutUsComponent';
 import InvestComponent from './component/InvestComponent';
 import HeaderComponent from './component/HeaderComponent';
 import PuddleComponent from './component/PuddleComponent';
+import MarketComponent from './component/MarketComponent';
 import TraderComponent from './component/TraderComponent';
 
 const router = createBrowserRouter(
@@ -13,6 +14,7 @@ const router = createBrowserRouter(
       <Route index element={<AboutUsComponent />} />
       <Route path="invest" element={<InvestComponent />} />
       <Route path="puddle" element={<PuddleComponent />} />
+      <Route path="market" element={<MarketComponent />} />
       <Route path="trader" element={<TraderComponent />} />
     </Route>
   )

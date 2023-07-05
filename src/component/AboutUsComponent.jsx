@@ -9,10 +9,26 @@ export default function AboutUsComponent() {
         &nbsp;
         <text style={{ color: "gold", fontSize: "30px" }}>Finance</text></h2>
       <h2>
-        We have excellent fund projects and professional teams
+        Description
       </h2>
+      <p>
+        Puddle Finance is a decentralized fund platform on SUI network, where traders, businesses, or senior investors can create funds using Puddle Finance. 
+      </p>
+      <p>
+        Users can entrust their assets to trusted funds for investment, and when the funds generate profits, they are shared with the investors.
+      </p>
 
-      <img src="/src/resources/puddle.png"></img>
+      <h2>
+        Origin of Project Name
+      </h2>
+      <p>
+        Our project is a fund platform that will allow a lot of money to flow in.
+      </p>
+      <p>
+        SUI's symbol is a water droplet, when a large amounts of SUI come together, they form a puddle. Therefore, this is why we are called “Puddle Finance”.
+      </p>
+
+      <img src="/src/resources/puddle_logo.jpg"></img>
 
     </div>
   );

@@ -104,9 +104,9 @@ export default function WalletComponent() {
 
   const wallet = useWallet();
   const { balance } = useAccountBalance();
-  const SUI_MAINNET_API_URL = CORS_URL + "https://fullnode.mainnet.sui.io";
-  const SUI_TESTNET_API_URL = CORS_URL + "https://fullnode.testnet.sui.io";
-  const SUI_DEVNET_API_URL = CORS_URL + "https://fullnode.devnet.sui.io";
+  const SUI_MAINNET_API_URL = "https://fullnode.mainnet.sui.io";
+  const SUI_TESTNET_API_URL =  "https://fullnode.testnet.sui.io";
+  const SUI_DEVNET_API_URL = "https://fullnode.devnet.sui.io";
 
   const SUI_MAINNET_SUIEXPLOR_URL = "https://suiexplorer.com/{type}/{id}?network=mainnet";
   const SUI_TESTNET_SUIEXPLOR_URL = "https://suiexplorer.com/{type}/{id}?network=testnet";

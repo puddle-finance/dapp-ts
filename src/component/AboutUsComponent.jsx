@@ -26,7 +26,7 @@ export default function AboutUsComponent() {
         Therefore, this is why we are called “Puddle Finance”.
       </p>
 
-      <img src="/src/resources/puddle_logo.jpg"></img>
+      <img src="../../src/resources/puddle_logo.jpg"></img>
 
     </div>
   );

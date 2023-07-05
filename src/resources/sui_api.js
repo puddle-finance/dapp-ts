@@ -90,7 +90,7 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress) {
             }
         }
     }
-    console.log(puddleObj)
+    //console.log(puddleObj)
     return puddleObj;
 }
 
@@ -353,6 +353,7 @@ export async function mergePuddleShares(wallet, coin_type, shares_id, merge_id_a
 export async function depositPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, amount, coin_decimals) {
 
     let txObj = new TransactionBlock();
+    txObj.splitCoins(txObj.gas, [txObj.pure(1000000)])
 
     let type_args = [];
     type_args.push(coin_type);
@@ -414,11 +415,6 @@ export async function depositPuddleShares(axios, apiurl, wallet, coin_type, pudd
 }
 
 export async function buyPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, product_id, price, coin_decimals) {
-    console.log(coin_type);
-    console.log(puddle_id);
-    console.log(product_id);
-    console.log(price);
-    console.log(coin_decimals);
 
     let txObj = new TransactionBlock();
 
@@ -514,7 +510,7 @@ export async function salePuddleShares(wallet, coin_type, puddle_id, shares_id, 
 async function handleSignTransaction(wallet, functionName, txObj, type_args, args, isReload) {
 
     if (wallet.connected) {
-
+        
         // call sui move smart contract
         txObj.moveCall({
             target: `${Puddle_Package_ID}::${Puddle_Module}::${functionName}`,

@@ -153,7 +153,7 @@ export default function MarketComponent() {
         let product_id = item?.id?.id;
         let coin_decimals = puddle?.coin_decimals;
         let price = item?.price;
-        buyPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, product_id, price, coin_decimals);
+        buyPuddleShares(wallet, coin_type, puddle_id, product_id, price, coin_decimals);
     }
 
     const resetInput = (share)=>{

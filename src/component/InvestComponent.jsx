@@ -172,7 +172,7 @@ export default function WalletComponent() {
     let puddle_id = puddle.id.id;
     let amount = payAmount;
 
-    depositPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, amount, coin_decimals);
+    depositPuddleShares(wallet, coin_type, puddle_id, amount, coin_decimals);
   }
 
   function saleAmount(puddle) {

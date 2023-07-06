@@ -1,9 +1,9 @@
-const Puddle_Package_ID = "0x9d7d5539e2fe8e4f04e87a74735b0f6b0665be397fb74dd443dbd3c6606cf319";
+const Puddle_Package_ID = "0x727ce1d17ad799557e36756bcf9072eefc4826e6d2d18915bb2e9476dfba7675";
 const Puddle_Module = "puddle";
 const Puddle_Gas_Budget = "100000000";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShares";
-const PuddleStatistics = "0x9b3e56df6dcb2b54184c4929c07053dd0a6959944ee05ccfd6cca786744b741a";
+const PuddleStatistics = "0xdacd23ce2857df4c8748dd295f9652fef7e56404d2c45482e2a3c1bdd8646848";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
@@ -357,67 +357,51 @@ export async function depositPuddleShares(axios, apiurl, wallet, coin_type, pudd
     let type_args = [];
     type_args.push(coin_type);
 
-    let coin_id = null;
+    if (wallet.connected) {
 
-    let coinArr = await getCoinArr(axios, apiurl, wallet.account.address, coin_type);
+        let amount_coin = Number(amount) * Number(coin_decimals) ;
+        let [coins] = txObj.splitCoins(txObj.gas, [txObj.pure(amount_coin)]);
 
-    let coin_count = 0;
-    let coin_balance = 0;
+        let args = [
+            txObj.object(puddle_id),
+            txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
+            coins,
+        ];
 
-    if (coinArr == undefined || coinArr == null || coinArr.length == 0) {
-        alert("No Balance");
-        return null;
-    } else {
-        coin_count = coinArr.length;
-        for (let i = 0; i < coinArr.length; i++) {
-            let coinObj = coinArr[i];
-            if (Number(coinObj.balance) / Number(coin_decimals) >= Number(amount)) {
-                coin_id = coinObj.coinObjectId;
-                coin_balance = coinObj.balance;
-                break;
-            }
+        // call sui move smart contract
+        txObj.moveCall({
+            target: `${Puddle_Package_ID}::${Puddle_Module}::mint`,
+            typeArguments: type_args,
+            arguments: args,
+        })
+
+        //console.log(JSON.stringify(args));
+        //txObj.setGasBudget(BigInt(30000000));
+        txObj.transferObjects([coins], txObj.pure(wallet.account.address));
+        txObj.setSender(wallet.account.address);
+
+        try {
+            // signature and Execute Transaction
+            const resData = await wallet.signAndExecuteTransactionBlock({
+                transactionBlock: txObj,
+                options: { showEffects: true },
+            });
+            console.log('successfully!', resData);
+            
+            window.location.reload();
+            
+        } catch (e) {
+            console.error('failed', e);
         }
     }
-
-    if (coin_id == null) {
-        alert("Insufficient Balance");
-        return null;
-    }
-
-    let args = [
-        txObj.object(puddle_id),
-        txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
-        txObj.object(coin_id),
-    ];
-
-    // if (coin_count < 2) {
-    //     const [coins] = txObj.splitCoins(txObj.object(coin_id), [
-    //         txObj.pure(BigInt(Number(coin_balance) - (Number(amount) * Number(coin_decimals)))),
-    //     ])
-    //     txObj.transferObjects([coins], txObj.object(wallet.account.address));
-    //     args = [
-    //         txObj.object(puddle_id),
-    //         txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
-    //         txObj.object(coin_id),
-    //     ];
-    // }else {
-    //     args = [
-    //         txObj.object(puddle_id),
-    //         txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
-    //         txObj.object(coin_id),
-    //     ];
-    // }
-
-    console.log(JSON.stringify(args));
-
-    handleSignTransaction(wallet, "mint", txObj, type_args, args, true);
+    
 }
 
 export async function buyPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, product_id, price, coin_decimals) {
 
     let txObj = new TransactionBlock();
 
-    txObj.setGasBudget(3000000);
+    
 
     let type_args = [];
     type_args.push(coin_type);

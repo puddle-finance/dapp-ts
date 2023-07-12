@@ -350,7 +350,7 @@ export async function mergePuddleShares(wallet, coin_type, shares_id, merge_id_a
     handleSignTransaction(wallet, "merge_shares", txObj, type_args, args, true);
 }
 
-export async function depositPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, amount, coin_decimals) {
+export async function depositPuddleShares( wallet, coin_type, puddle_id, amount, coin_decimals) {
 
     let txObj = new TransactionBlock();
 
@@ -397,48 +397,50 @@ export async function depositPuddleShares(axios, apiurl, wallet, coin_type, pudd
     
 }
 
-export async function buyPuddleShares(axios, apiurl, wallet, coin_type, puddle_id, product_id, price, coin_decimals) {
+export async function buyPuddleShares(wallet, coin_type, puddle_id, product_id, price, coin_decimals) {
 
     let txObj = new TransactionBlock();
 
-    
 
     let type_args = [];
     type_args.push(coin_type);
 
-    let coin_id = null;
+    if (wallet.connected) {
+        let amount_coin = Number(price) * Number(coin_decimals) ;
+        let [coins] = txObj.splitCoins(txObj.gas, [txObj.pure(amount_coin)]);
 
-    let coinArr = await getCoinArr(axios, apiurl, wallet.account.address, coin_type);
-    if (coinArr == undefined || coinArr == null || coinArr.length == 0) {
-        alert("No Balance");
-        return null;
-    } else {
-        
+        let args = [
+            txObj.object(puddle_id),
+            txObj.object(product_id),
+            coins,
+        ];
 
-        for (let i = 0; i < coinArr.length; i++) {
-            let coinObj = coinArr[i];
-            if (Number(coinObj.balance) / Number(coin_decimals) >= Number(price)) {
-                coin_id = coinObj.coinObjectId;
-                break;
-            }
+        // call sui move smart contract
+        txObj.moveCall({
+            target: `${Puddle_Package_ID}::${Puddle_Module}::buy_shares`,
+            typeArguments: type_args,
+            arguments: args,
+        })
+
+        txObj.transferObjects([coins], txObj.pure(wallet.account.address));
+        txObj.setSender(wallet.account.address);
+
+        try {
+            // signature and Execute Transaction
+            const resData = await wallet.signAndExecuteTransactionBlock({
+                transactionBlock: txObj,
+                options: { showEffects: true },
+            });
+            console.log('successfully!', resData);
+            
+            window.location.reload();
+            
+        } catch (e) {
+            console.error('failed', e);
         }
+
+
     }
-    console.log(coin_id);
-
-    if (coin_id == null) {
-        alert("Insufficient Balance");
-        return null;
-    }
-
-    let args = [
-        txObj.object(puddle_id),
-        txObj.object(product_id),
-        txObj.object(coin_id),
-    ];
-
-    console.log(JSON.stringify(args));
-
-    handleSignTransaction(wallet, "buy_shares", txObj, type_args, args, true);
 
 }
 

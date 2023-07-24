@@ -307,13 +307,13 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress) {
         let obj = response.data.result.data.content.fields;
         puddleStatisticsObj.id = obj.id;
 
-        let closed_puddles = [];
-        for (let i = 0; i < obj.closed_puddles.length; i++) {
-            await getPuddleById(axios, apiurl, obj.closed_puddles[i], walletAddress).then(rep => {
-                closed_puddles.push(rep);
-            });
-        }
-        puddleStatisticsObj.closed_puddles = closed_puddles;
+        // let closed_puddles = [];
+        // for (let i = 0; i < obj.closed_puddles.length; i++) {
+        //     await getPuddleById(axios, apiurl, obj.closed_puddles[i], walletAddress).then(rep => {
+        //         closed_puddles.push(rep);
+        //     });
+        // }
+        // puddleStatisticsObj.closed_puddles = closed_puddles;
 
         let in_progress_puddles = [];
         for (let i = 0; i < obj.in_progress_puddles.length; i++) {
@@ -323,9 +323,9 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress) {
         }
         puddleStatisticsObj.in_progress_puddles = in_progress_puddles;
 
-        await getTableKeyValue(axios, apiurl, obj.puddle_owner_table.fields.id.id).then(rep => {
-            puddleStatisticsObj.puddle_owner_table = rep;
-        });
+        // await getTableKeyValue(axios, apiurl, obj.puddle_owner_table.fields.id.id).then(rep => {
+        //     puddleStatisticsObj.puddle_owner_table = rep;
+        // });
     }
     return puddleStatisticsObj;
 }

@@ -15,7 +15,7 @@ export default function HeaderComponent() {
 
     const dexLiStyle = {
         opacity: '1',
-        order: '1',
+        //order: '0',
         display: 'flex',
         alignItems: 'center',
         marginLeft: '40px'
@@ -32,11 +32,11 @@ export default function HeaderComponent() {
     }
 
     const connectWallet = {
-        opacity: '1',
-        order: '10',
-        display: 'flex',
-        alignItems: 'center',
-        marginLeft: '40px'
+        opacity: '0.8', //透明度 0~1
+        order: '0', //順序
+        display: "inline flex",
+        alignItems: 'centor', 
+        marginLeft: '80px' //左邊界
     }
 
     const [selectedKey, setSelectedKey] = useState('about');
@@ -53,36 +53,44 @@ export default function HeaderComponent() {
 
     return (
         <>
-            <Menu onClick={menuOnClick} selectedKeys={[selectedKey]} mode="horizontal" theme="dark" >
-                <li style={dexLiStyle}>
-                    <h1 style={dexStyle}>
-                        <b>
-                        <span style={{ color: "deepskyblue", fontSize: "30px" }}>Puddle</span>
-                        &nbsp;
-                        <span style={{ color: "gold", fontSize: "30px" }}>Finance</span>
-                        </b>
-                    </h1>
-                </li>
-                <Menu.Item id="about" key="about" icon={<IdcardTwoTone style={fontSize} />} style={menuStyle}>
-                    <Link to="" style={fontSize}>About Us</Link>
-                </Menu.Item>
-                <Menu.Item id="puddle" key="puddle" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
-                    <Link to="puddle" style={fontSize}>Puddle</Link>
-                </Menu.Item>
-                <Menu.Item id="invest" key="invest" icon={<DollarTwoTone style={fontSize} />} style={menuStyle}>
-                    <Link to="invest" style={fontSize}>Invest</Link>
-                </Menu.Item>
-                
-                <Menu.Item id="market" key="market" icon={<PiSwap style={fontSize} />} style={menuStyle}>
-                    <Link to="market" style={fontSize}>Market</Link>
-                </Menu.Item>
-                <Menu.Item id="trader" key="trader" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
-                    <Link to="trader" style={fontSize}>Trader</Link>
-                </Menu.Item>
-                <li style={connectWallet}>
-                    <ConnectButton />
-                </li>
-            </Menu>
+            <table>
+                <tr>
+                    <td>
+                        <li style={dexLiStyle}>
+                            <h1 style={dexStyle}>
+                                <b>
+                                <span style={{ color: "deepskyblue", fontSize: "30px" }}>Puddle</span>
+                                &nbsp;
+                                <span style={{ color: "gold", fontSize: "30px" }}>Finance</span>
+                                </b>
+                            </h1>
+                        </li>
+                    </td>
+                    <td>
+                        <Menu onClick={menuOnClick} selectedKeys={[selectedKey]} mode="horizontal" theme="black" >
+                            <Menu.Item id="puddle" key="puddle" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
+                                <Link to="puddle" style={fontSize}>Puddle</Link>
+                            </Menu.Item>
+                            <Menu.Item id="invest" key="invest" icon={<DollarTwoTone style={fontSize} />} style={menuStyle}>
+                                <Link to="invest" style={fontSize}>Invest</Link>
+                            </Menu.Item>
+
+                            <Menu.Item id="market" key="market" icon={<PiSwap style={fontSize} />} style={menuStyle}>
+                                <Link to="market" style={fontSize}>Market</Link>
+                            </Menu.Item>
+                            <Menu.Item id="trader" key="trader" icon={<BankTwoTone style={fontSize} />} style={menuStyle}>
+                                <Link to="trader" style={fontSize}>Trader</Link>
+                            </Menu.Item>
+                        </Menu>                        
+                    </td>
+                    <td>
+                        <li style={connectWallet}>
+                                <ConnectButton />
+                        </li>
+                    </td>
+                </tr>
+            </table>
+
             <Outlet />
         </>
     );

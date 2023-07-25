@@ -9,8 +9,6 @@ import {
   useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import { TransactionBlock } from "@mysten/sui.js";
-
 import { useState, useEffect, useRef } from 'react';
 
 import {
@@ -137,7 +135,7 @@ export default function WalletComponent() {
   }, [wallet.connected]);
 
   function getFundsData() {
-    getPuddleStatistics(axios, apiurl, wallet.account.address).then(resp => {
+    getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'invest').then(resp => {
       setPuddleStatistics(resp);
     });
   }

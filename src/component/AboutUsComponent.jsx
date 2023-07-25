@@ -27,8 +27,8 @@ export default function AboutUsComponent() {
       </p>
 
       <Image borderRadius='full'
-  src='https://i.imgur.com/id7Mdg4.jpeg'
-  />
+        src='https://i.imgur.com/id7Mdg4.jpeg'
+      />
 
     </div>
   );

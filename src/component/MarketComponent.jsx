@@ -10,7 +10,6 @@ import {
   } from "@suiet/wallet-kit";
   
   import {BiSearchAlt} from 'react-icons/bi';
-  import {TransactionBlock} from "@mysten/sui.js";
   
   import { useState, useEffect, useRef } from 'react';
   
@@ -22,7 +21,6 @@ import {
   } from "../resources/sui_api.js";
   
   import axios from 'axios';
-  import ItemComponent from './SalingItemComponent.jsx';
   import { InfoOutlineIcon } from '@chakra-ui/icons'
   import {
     Box,
@@ -111,7 +109,7 @@ export default function MarketComponent() {
     }, [wallet.connected]);
 
     function getFundsData() {
-    getPuddleStatistics(axios, apiurl, wallet.account.address).then(resp => {
+    getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'market').then(resp => {
         setPuddleStatistics(resp);
     });
     }
@@ -328,6 +326,13 @@ export default function MarketComponent() {
                                 borderStyle={'solid'}
                                 overflow={'scroll'}
                                 >
+                                    <Center>
+                                        <Text 
+                                            fontSize={'30px'}
+                                            style={{ ...ThStyle}}>
+                                                Buy Shares
+                                        </Text>
+                                    </Center>
                                     <Center mt={'10px'} mb={'15px'}>
                                         <Input
                                             placeholder={'Puddle Name..'}
@@ -352,7 +357,7 @@ export default function MarketComponent() {
 
                                     </Center>
                                     {
-                                        puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name == searchKeyword).map(puddle => {
+                                        puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.includes(searchKeyword)).map(puddle => {
                                             return(
                                             puddle.market_info.items?.map(item =>{
                                                 

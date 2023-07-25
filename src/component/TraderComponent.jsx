@@ -9,8 +9,6 @@ import {
     useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import { TransactionBlock } from "@mysten/sui.js";
-
 import { useState, useEffect, useRef } from 'react';
 
 import {

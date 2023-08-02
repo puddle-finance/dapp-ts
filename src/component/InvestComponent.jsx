@@ -11,7 +11,7 @@ import {
 
 import { TransactionBlock } from "@mysten/sui.js";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import {
   getYourInvestItems,
@@ -135,18 +135,18 @@ export default function WalletComponent() {
       getFundsData();
     }
   }, [wallet.connected]);
-
-  function getFundsData() {
+  
+  const getFundsData = useCallback(() => {
     getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'invest').then(resp => {
-      setPuddleStatistics(resp);
-    });
-  }
+          setPuddleStatistics(resp);
+        });
+  });
 
-  function getYourInvsetFunds() {
+  const getYourInvsetFunds = useCallback(() => {
     getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
       setYourInvestItem(resp);
     });
-  }
+  });
 
   const changePayAmount = (e) => {
     setPayAmount(e.target.value);

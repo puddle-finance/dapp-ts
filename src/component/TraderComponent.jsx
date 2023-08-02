@@ -11,7 +11,7 @@ import {
 
 import { TransactionBlock } from "@mysten/sui.js";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import {
     getYourFundItems,
@@ -139,11 +139,11 @@ export default function WalletComponent() {
         }
     }, [wallet.connected]);
 
-    function getYourPuddlesData() {
+    const getYourPuddlesData = useCallback(() => {
         getYourFundItems(axios, apiurl, wallet.account.address).then(resp => {
             setYourPuddles(resp);
         });
-    }
+    });
 
     function inputMaxSupply(e) {
         setMaxSupply(e.target.value);

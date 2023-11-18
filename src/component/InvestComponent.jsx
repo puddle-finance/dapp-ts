@@ -71,7 +71,7 @@ export default function WalletComponent() {
 
   const ThStyle = {
     fontSize: '24px',
-    color: 'darkorchid',
+    color: 'deepskyblue',
   }
 
   const TdStyle = {
@@ -204,7 +204,7 @@ export default function WalletComponent() {
   return (
     <div className="wallet" style={walletStyle}>
       <div style={WalletTableStyle}>
-        <h1 style={{ color: 'dodgerblue' }}>Wallet Detail</h1>
+        <h1 style={{ color: 'gold' }}>Wallet Detail</h1>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -328,17 +328,19 @@ export default function WalletComponent() {
                                     <Td>
                                       <div id={puddle.puddle.id.id + "_depositAmount"} style={{ display: 'none' }}>
                                         <div>
-                                          <p>Amount</p>
+                                          <p style={ThStyle}>Amount</p>
                                           <input type="number" onChange={changePayAmount} value={payAmount} />
                                         </div>
-                                        <button className="btn" onClick={() => depositAmount(puddle)}>Confirm</button>
-                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                        <div >
+                                          <button className="btn" onClick={() => depositAmount(puddle)} style={{marginTop: '10px'}}>Confirm</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px', marginTop: '10px'}}>Cancel</button>
+                                        </div>
                                       </div>
 
                                       <div id={puddle.puddle.id.id + "_saleAmount"} style={{ display: 'none' }}>
                                         <p>
                                           <span>
-                                            <p>Amount</p>
+                                            <p style={ThStyle}>Amount</p>
                                             <input type="number" onChange={changePayAmount} value={payAmount} />
                                           </span>
                                           <span>
@@ -346,8 +348,8 @@ export default function WalletComponent() {
                                             <input type="number" onChange={changePayPrice} value={payPrice} />
                                           </span>
                                         </p>
-                                        <button className="btn" onClick={() => saleAmount(puddle)}>Confirm</button>
-                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                        <button className="btn" onClick={() => saleAmount(puddle)} style={{marginTop: '10px'}}>Confirm</button>
+                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px',marginTop: '10px'}}>Cancel</button>
                                       </div>
                                     </Td>
                                   </Tr>
@@ -369,7 +371,7 @@ export default function WalletComponent() {
       </div>
 
       <div style={FundTableStyle}>
-        <h1 style={{ color: 'fuchsia' }}>Puddles</h1>
+        <h1 style={{ color: 'gold' }}>Puddles</h1>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -461,17 +463,17 @@ export default function WalletComponent() {
                                       <Td>
                                         <div id={puddle.id.id + "_depositAmount"} style={{ display: 'none' }}>
                                           <div>
-                                            <p>Amount</p>
+                                            <p style={ThStyle}>Amount</p>
                                             <input type="number" onChange={changePayAmount} value={payAmount} />
                                           </div>
-                                          <button className="btn" onClick={() => depositAmount(puddle)}>Confirm</button>
-                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                          <button className="btn" onClick={() => depositAmount(puddle)} style={{marginTop: '10px'}}>Confirm</button>
+                                          <button className="btn"  onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px', marginTop: '10px'}}>Cancel</button>
                                         </div>
   
                                         <div id={puddle.id.id + "_saleAmount"} style={{ display: 'none' }}>
                                           <p>
                                             <span>
-                                              <p>Amount</p>
+                                              <p style={ThStyle}>Amount</p>
                                               <input type="number" onChange={changePayAmount} value={payAmount} />
                                             </span>
                                             <span>
@@ -480,7 +482,7 @@ export default function WalletComponent() {
                                             </span>
                                           </p>
                                           <button className="btn" onClick={() => saleAmount(puddle)}>Confirm</button>
-                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]}>Cancel</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px'}}>Cancel</button>
                                         </div>
                                       </Td>
                                     </Tr>

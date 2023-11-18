@@ -9,16 +9,6 @@ import {
     useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import { useState, useEffect, useRef } from 'react';
-
-import {
-    getYourFundItems,
-    createPuddle,
-    modifyPuddle,
-} from "../resources/sui_api.js";
-
-import axios from 'axios';
-
 import {
     Table,
     Thead,
@@ -29,17 +19,103 @@ import {
     Td,
     TableCaption,
     TableContainer,
-    Tab,
-    Icon,
+    GridItem,
+    Grid
+} from '@chakra-ui/react'
+
+import { useState, useEffect, useRef } from 'react';;
+import { Chart } from "react-google-charts";
+
+import {
+    getYourFundItems,
+    createPuddle,
+    modifyPuddle,
+} from "../resources/sui_api.js";
+
+// import { createColumnHelper } from "@tanstack/react-table"
+// import DataTableComponent from './DataTableComponent';
+
+import axios from 'axios';
+
+import {
+    Box,
+    Container,
+    Flex,
+    Center,
+    SimpleGrid,
+    Card,
+    CardBody,
+    Text,
+    NumberInput,
+    Tooltip,
+    Select,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
+    Button,
+    Alert,
+    AlertIcon,
     Input,
-    position,
+    Spacer
 } from '@chakra-ui/react';
 
-import { CloseIcon } from '@chakra-ui/icons'
 
-import Popup from 'reactjs-popup';
+
 import '../resources/style.css';
 import 'reactjs-popup/dist/index.css';
+
+export const data = [
+    ["Type", "Amount", "Cost", "Value"],
+    ["CETUS", 6000, 1000, 4000],
+    ["USDT", 30000, 2000, 3000],
+    ["TURBOS", 2000, 3000, 1000],
+    ["SUI", 4000, 2000, 8000]
+];
+
+// const data = [
+//     {
+//       fromUnit: "inches",
+//       toUnit: "millimetres (mm)",
+//       factor: 25.4
+//     },
+//     {
+//       fromUnit: "feet",
+//       toUnit: "centimetres (cm)",
+//       factor: 30.48
+//     },
+//     {
+//       fromUnit: "yards",
+//       toUnit: "metres (m)",
+//       factor: 0.91444
+//     }
+//   ]
+
+//   const columnHelper = createColumnHelper()
+
+//   const columns = [
+//     columnHelper.accessor("fromUnit", {
+//       cell: info => info.getValue(),
+//       header: "To convert"
+//     }),
+//     columnHelper.accessor("toUnit", {
+//       cell: info => info.getValue(),
+//       header: "Into"
+//     }),
+//     columnHelper.accessor("factor", {
+//       cell: info => info.getValue(),
+//       header: "Multiply by",
+//       meta: {
+//         isNumeric: true
+//       }
+//     })
+//   ]
+
+export const options = {
+    title: "Dashboard",
+    is3D: false,
+    backgroundColor: "transparent"
+};
 
 export default function WalletComponent() {
 
@@ -69,7 +145,7 @@ export default function WalletComponent() {
 
     const ThStyle = {
         fontSize: '24px',
-        color: 'darkorchid',
+        color: 'deepskyblue',
     }
 
     const TdStyle = {
@@ -190,10 +266,138 @@ export default function WalletComponent() {
     }
 
     return (
-        <div className="puddle" style={PuddlStyle}>
-            <h2 style={{ color: 'gold'}}>
-                To Be Continue ...
-            </h2>
-        </div >
+        <Box w={'100%'} h={'100%'} mt={'auto'}>
+            <Center w={'100%'}>
+                <Container maxW={'1100px'} w={'100%'}>
+                    <Flex
+                        px={'10px'} //padding-left, padding-right
+                        bg={{ base: '#FFF', md: '#FFF' }}
+                        h={'100px'}
+                        borderRadius={'2px'}
+                        boxShadow={'lg'}
+                    >
+                        <Grid maxW={'1200px'} w={'100%'} templateColumns='repeat(2, 1fr)'>
+                            {/*左上半邊的卡片 */}
+                            <GridItem
+                                borderRadius={'2px'}
+                                borderWidth={'0.5px'}
+                                borderColor={'gold'}
+                                borderStyle={'solid'}
+                            >
+                                <Center>
+                                    <Text
+                                        fontSize={'30px'}
+                                        style={{ ...ThStyle }}>
+                                        Select Puddle
+                                    </Text>
+                                </Center>
+                                <Center>
+                                    <Card>
+                                        <CardBody>
+                                            {/*Sale Form */}
+                                            <Flex>
+                                                <Select
+                                                    borderRadius={'2px'}
+                                                    bg='#919fc6'
+                                                    color='white'
+                                                    size='lg'
+                                                    width={'150px'}
+                                                    height={'40px'}
+                                                    value={'selectedPuddleId'}
+                                                    onChange={(e) => handleSelectAction(e)}
+                                                    placeholder="Select Puddle...">
+                                                </Select>
+
+                                            </Flex>
+                                        </CardBody>
+                                    </Card>
+                                </Center>
+                            </GridItem >
+                            {/*右上半邊的卡片 */}
+                            <GridItem
+                                borderRadius={'2px'}
+                                borderWidth={'0.5px'}
+                                borderColor={'gold'}
+                                borderStyle={'solid'}
+                            >
+                                <Center>
+                                    <Text
+                                        fontSize={'30px'}
+                                        style={{ ...ThStyle }}>
+                                        Transaction
+                                    </Text>
+                                </Center>
+                                <Center>
+                                    <Card>
+                                        <CardBody>
+                                            {/*Sale Form */}
+                                            <Center mt={'10px'} mb={'10px'}>
+                                                <div style={FundTableStyle}>
+                                                    <h1 style={{ color: 'gold' }}>Puddles</h1>
+                                                    <Flex>
+                                                        <Button
+                                                            width={'150px'}
+                                                            height={'50px'}
+                                                            color={'black'}
+                                                            bg='#b8d8e5'
+                                                            variant='solid'
+                                                            borderRadius={'2px'}
+                                                            size={'lg'}
+                                                            mr={'40px'}
+                                                        >Reset</Button>
+                                                        <Button
+                                                            width={'150px'}
+                                                            height={'50px'}
+                                                            color={'black'}
+                                                            bg='#fac7d3'
+                                                            variant='solid'
+                                                            borderRadius={'2px'}
+                                                            size={'lg'}
+                                                            ml={'40px'}
+                                                        >Submit</Button>
+                                                    </Flex>
+                                                </div>
+
+                                            </Center>
+                                        </CardBody>
+                                    </Card>
+                                </Center>
+                            </GridItem >
+                            {/*左下半邊的卡片 */}
+                            <GridItem
+                                borderRadius={'2px'}
+                                borderWidth={'0.5px'}
+                                borderColor={'gold'}
+                                borderStyle={'solid'}>
+                                <Chart
+                                    chartType="PieChart"
+                                    data={data}
+                                    options={options}
+                                    width={"100%"}
+                                    height={"400px"}
+                                />
+                            </GridItem>
+                            {/*右下半邊的卡片 */}
+                            <GridItem
+                                borderRadius={'2px'}
+                                borderWidth={'0.5px'}
+                                borderColor={'gold'}
+                                borderStyle={'solid'}>
+                                <TableContainer>
+                                    <Chart
+                                        chartType="Table"
+                                        width="100%"
+                                        height="400px"
+                                        data={data}
+                                        options={options}
+                                    />
+                                </TableContainer>
+                            </GridItem>
+                        </Grid>
+                    </Flex>
+                </Container>
+            </Center>
+        </Box>
+
     );
 }

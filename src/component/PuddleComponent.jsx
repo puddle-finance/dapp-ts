@@ -60,7 +60,7 @@ export default function WalletComponent() {
   const FundTableStyle = {
     backgroundColor: '#111524',
     border: '1px solid darkgoldenrod',
-    padding: '20px',
+    padding: '18px',
     borderRadius: '18px',
     width: '45vw',
     margin: '15px',
@@ -69,7 +69,7 @@ export default function WalletComponent() {
 
   const ThStyle = {
     fontSize: '24px',
-    color: 'darkorchid',
+    color: 'deepskyblue',
   }
 
   const TdStyle = {
@@ -268,8 +268,9 @@ export default function WalletComponent() {
                 </Table>
 
                 <div>
+                  
                   <button className="btn" onClick={() => save()}>Save</button>
-                  <button className="btn"
+                  <button className="btn" style={{marginLeft:'10px'}}
                     onClick={() =>
                       [
                         setMaxSupply(0),
@@ -286,7 +287,7 @@ export default function WalletComponent() {
           )}
         </Popup>
 
-        <h1 style={{ color: 'gold', display: 'inline-block' }}>Your Puddles</h1>
+        <h1 style={{ color: 'gold', display: 'inline-block', padding: '10px'}}>Your Puddles</h1>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>

@@ -55,7 +55,7 @@ export default function WalletComponent() {
     padding: '20px',
     borderRadius: '18px',
     width: '45vw',
-    margin: '15px',
+    margin: '0px',
     display: 'inline-table',
   }
 
@@ -65,7 +65,7 @@ export default function WalletComponent() {
     padding: '20px',
     borderRadius: '18px',
     width: '45vw',
-    margin: '15px',
+    margin: '18px',
     display: 'inline-table',
   }
 

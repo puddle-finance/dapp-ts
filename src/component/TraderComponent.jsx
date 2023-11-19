@@ -57,10 +57,11 @@ import {
     Alert,
     AlertIcon,
     Input,
-    Spacer
+    Spacer,
+    Square,
+    VStack,
+    Stack
 } from '@chakra-ui/react';
-
-
 
 import '../resources/style.css';
 import 'reactjs-popup/dist/index.css';
@@ -70,76 +71,38 @@ export const data = [
     ["CETUS", 6000, 1000, 4000],
     ["USDT", 30000, 2000, 3000],
     ["TURBOS", 2000, 3000, 1000],
-    ["SUI", 4000, 2000, 8000]
+    ["SUI", 4000, 2000, 8000],
+    ["aaa", 4000, 2000, 8000],
+    ["bbb", 4000, 2000, 8000],
+    ["ccc", 4000, 2000, 8000],
+    ["ddd", 4000, 2000, 8000],
+    ["eee", 4000, 2000, 8000],
+    ["fff", 4000, 2000, 8000],
+    ["ggg", 4000, 2000, 8000]
 ];
 
-// const data = [
-//     {
-//       fromUnit: "inches",
-//       toUnit: "millimetres (mm)",
-//       factor: 25.4
-//     },
-//     {
-//       fromUnit: "feet",
-//       toUnit: "centimetres (cm)",
-//       factor: 30.48
-//     },
-//     {
-//       fromUnit: "yards",
-//       toUnit: "metres (m)",
-//       factor: 0.91444
-//     }
-//   ]
-
-//   const columnHelper = createColumnHelper()
-
-//   const columns = [
-//     columnHelper.accessor("fromUnit", {
-//       cell: info => info.getValue(),
-//       header: "To convert"
-//     }),
-//     columnHelper.accessor("toUnit", {
-//       cell: info => info.getValue(),
-//       header: "Into"
-//     }),
-//     columnHelper.accessor("factor", {
-//       cell: info => info.getValue(),
-//       header: "Multiply by",
-//       meta: {
-//         isNumeric: true
-//       }
-//     })
-//   ]
-
-export const options = {
-    title: "Dashboard",
-    is3D: false,
-    backgroundColor: "transparent"
-};
-
 export default function WalletComponent() {
-
-    const PuddlStyle = {
+    const walletStyle = {
         textAlign: 'center'
     }
 
-    const PuddleTableStyle = {
+    const DashboardTableStyle = {
         backgroundColor: '#111524',
         border: '1px solid darkgoldenrod',
-        padding: '20px',
+        padding: '5px',
         borderRadius: '18px',
         width: '80vw',
-        margin: '15px',
         display: 'inline-table',
     }
 
-    const FundTableStyle = {
+    const puddleSettingTableStyle = {
         backgroundColor: '#111524',
         border: '1px solid darkgoldenrod',
-        padding: '20px',
+        padding: '5px',
         borderRadius: '18px',
-        width: '45vw',
-        margin: '15px',
+        width: '65vw',
+        hight: '5vw',
+        margin: '10px',
         display: 'inline-table',
     }
 
@@ -159,6 +122,37 @@ export default function WalletComponent() {
     const displayNone = {
         display: 'none'
     }
+
+    const pieChartOptions = {
+        backgroundColor: "transparent",
+        width: "30vw",
+        hight: "50vw",
+        fontSize: "16",
+        is3D: true,
+        legend: { position: 'right', textStyle: { color: 'white', fontSize: 16 } },
+        pieHole: '0.4',
+        chartArea: { width: '70%', height: '100%' }
+    };
+
+    const tableChartOptions = {
+        is3D: true,
+        backgroundColor: "transparent",
+        width: "45vw",
+        hight: "50vw",
+        pageSize: 8,
+        cssClassNames: {
+            headerRow: 'headerRowClass',
+            tableRow: 'tableRowClass',
+            oddTableRow: 'oddTableRowClass',
+            selectedTableRow: 'selectedTableRowClass',
+            hoverTableRow: 'hoverTableRowClass',
+            headerCell: 'headerCellClass',
+            tableCell: 'tableCellClass'
+        },
+        chartArea: { width: '100%', height: '90%' }
+    };
+
+
 
     function timestampChange(timestamp) {
         if (timestamp == 0) {
@@ -266,138 +260,84 @@ export default function WalletComponent() {
     }
 
     return (
-        <Box w={'100%'} h={'100%'} mt={'auto'}>
-            <Center w={'100%'}>
-                <Container maxW={'1100px'} w={'100%'}>
-                    <Flex
-                        px={'10px'} //padding-left, padding-right
-                        bg={{ base: '#FFF', md: '#FFF' }}
-                        h={'100px'}
-                        borderRadius={'2px'}
-                        boxShadow={'lg'}
-                    >
-                        <Grid maxW={'1200px'} w={'100%'} templateColumns='repeat(2, 1fr)'>
-                            {/*左上半邊的卡片 */}
-                            <GridItem
-                                borderRadius={'2px'}
-                                borderWidth={'0.5px'}
-                                borderColor={'gold'}
-                                borderStyle={'solid'}
-                            >
-                                <Center>
-                                    <Text
-                                        fontSize={'30px'}
-                                        style={{ ...ThStyle }}>
-                                        Select Puddle
-                                    </Text>
-                                </Center>
-                                <Center>
-                                    <Card>
-                                        <CardBody>
-                                            {/*Sale Form */}
-                                            <Flex>
-                                                <Select
-                                                    borderRadius={'2px'}
-                                                    bg='#919fc6'
-                                                    color='white'
-                                                    size='lg'
-                                                    width={'150px'}
-                                                    height={'40px'}
-                                                    value={'selectedPuddleId'}
-                                                    onChange={(e) => handleSelectAction(e)}
-                                                    placeholder="Select Puddle...">
-                                                </Select>
+        <div className="wallet" style={walletStyle}>
+            <Center>
+                <Flex>
+                    <Box>
+                        <Text
+                            style={{ ...ThStyle }}>
+                            Select Puddle
+                        </Text>
+                        <Select
+                            borderRadius={'2px'}
+                            bg='#919fc6'
+                            color='white'
+                            size='md'
+                            width={'150px'}
+                            height={'40px'}
+                            value={'selectedPuddleId'}
+                            onChange={(e) => handleSelectAction(e)}
+                            margin={'35px'}
+                            placeholder="Select Puddle...">
+                        </Select>
+                    </Box>
 
-                                            </Flex>
-                                        </CardBody>
-                                    </Card>
-                                </Center>
-                            </GridItem >
-                            {/*右上半邊的卡片 */}
-                            <GridItem
-                                borderRadius={'2px'}
-                                borderWidth={'0.5px'}
-                                borderColor={'gold'}
-                                borderStyle={'solid'}
-                            >
-                                <Center>
-                                    <Text
-                                        fontSize={'30px'}
-                                        style={{ ...ThStyle }}>
-                                        Transaction
-                                    </Text>
-                                </Center>
-                                <Center>
-                                    <Card>
-                                        <CardBody>
-                                            {/*Sale Form */}
-                                            <Center mt={'10px'} mb={'10px'}>
-                                                <div style={FundTableStyle}>
-                                                    <h1 style={{ color: 'gold' }}>Puddles</h1>
-                                                    <Flex>
-                                                        <Button
-                                                            width={'150px'}
-                                                            height={'50px'}
-                                                            color={'black'}
-                                                            bg='#b8d8e5'
-                                                            variant='solid'
-                                                            borderRadius={'2px'}
-                                                            size={'lg'}
-                                                            mr={'40px'}
-                                                        >Reset</Button>
-                                                        <Button
-                                                            width={'150px'}
-                                                            height={'50px'}
-                                                            color={'black'}
-                                                            bg='#fac7d3'
-                                                            variant='solid'
-                                                            borderRadius={'2px'}
-                                                            size={'lg'}
-                                                            ml={'40px'}
-                                                        >Submit</Button>
-                                                    </Flex>
-                                                </div>
 
-                                            </Center>
-                                        </CardBody>
-                                    </Card>
-                                </Center>
-                            </GridItem >
-                            {/*左下半邊的卡片 */}
-                            <GridItem
+                    <div style={puddleSettingTableStyle}>
+                        <h1 style={{ color: 'gold' }}>Transaction Setting</h1>
+                        <VStack>
+                            <Select
                                 borderRadius={'2px'}
-                                borderWidth={'0.5px'}
-                                borderColor={'gold'}
-                                borderStyle={'solid'}>
-                                <Chart
-                                    chartType="PieChart"
-                                    data={data}
-                                    options={options}
-                                    width={"100%"}
-                                    height={"400px"}
-                                />
-                            </GridItem>
-                            {/*右下半邊的卡片 */}
-                            <GridItem
-                                borderRadius={'2px'}
-                                borderWidth={'0.5px'}
-                                borderColor={'gold'}
-                                borderStyle={'solid'}>
-                                <TableContainer>
-                                    <Chart
-                                        chartType="Table"
-                                        width="100%"
-                                        height="400px"
-                                        data={data}
-                                        options={options}
-                                    />
-                                </TableContainer>
-                            </GridItem>
-                        </Grid>
-                    </Flex>
-                </Container>
+                                bg='#919fc6'
+                                color='white'
+                                size='lg'
+                                width={'150px'}
+                                height={'40px'}
+                                value={'selectedPuddleId'}
+                                onChange={(e) => handleSelectAction(e)}
+                                placeholder="Select Cion Type..." />
+                            <NumberInput width={'400px'} margin={'5px'}>
+                                <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                <NumberInputStepper height={"40%"} mr={'5px'}>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                </NumberInputStepper>
+                            </NumberInput>
+                            <Flex margin={'10px'}>
+                                <Button
+                                    className="btn"
+                                    onClick={(e) => {
+                                        if (yourInvestItem.length > 0) {
+                                            let share = yourInvestItem.filter(sh => sh.puddle.id.id == selectedPuddleId)[0];
+                                            saleShares(share);
+                                        }
+                                    }}
+                                >Reset</Button>
+                                <Button className="btn" style={{ marginLeft: '10px' }}>Submit</Button>
+                            </Flex>
+                        </VStack>
+                    </div>
+                </Flex>
             </Center>
-        </Box>
-
+            <div style={DashboardTableStyle}>
+                <h1 style={{ color: 'gold' }}>Dashboard</h1>
+                <Flex>
+                    <Box marginBottom={'20px'}>
+                        <Chart
+                            chartType="PieChart"
+                            data={data}
+                            options={pieChartOptions}
+                        />
+                    </Box>
+                    <Box marginBottom={'20px'}>
+                        <Chart
+                            chartType="Table"
+                            data={data}
+                            options={tableChartOptions}
+                        />
+                    </Box>
+                </Flex>
+            </div>
+        </div>
     );
 }

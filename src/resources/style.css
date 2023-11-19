@@ -119,3 +119,35 @@ textarea:focus {
     height: 34px;
     overflow: hidden;
 }
+
+/*  
+    headerRow: 'headerRowClass',
+    tableRow: 'tableRowClass',
+    oddTableRow: 'oddTableRowClass',
+    selectedTableRow: 'selectedTableRowClass',
+    hoverTableRow: 'hoverTableRowClass',
+    headerCell: 'headerCellClass',
+    tableCell: 'tableCellClass' 
+*/
+
+.headerRowClass {
+  background: #022d4f;
+}
+.tableRowClass {
+  background: #4491d4;
+}
+.oddTableRowClass {
+  background: #6e8498;
+}
+/* .selectedTableRowClass {
+  background: #4b5a69;
+} */
+.hoverTableRowClass {
+  background: #50585e;
+}
+/* .headerCellClass {
+  background: #23679e;
+}
+.tableCellClass {
+  background: #817e7e;
+} */

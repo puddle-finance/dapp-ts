@@ -1,26 +1,4 @@
-import {
-    ConnectButton,
-    useAccountBalance,
-    useWallet,
-    SuiChainId,
-    ErrorCode,
-    formatSUI,
-    addressEllipsis,
-    useSuiProvider,
-  } from "@suiet/wallet-kit";
-  
-  import {TransactionBlock} from "@mysten/sui.js";
-  
-  import { useState, useEffect, useRef } from 'react';
-  
-  import {
-    getYourFundItems,
-    getYourInvestItems,
-    getPuddleStatistics,
-  } from "../resources/sui_api.js";
-  
-  import axios from 'axios';
-  import SalingItemComponent from './SalingItemComponent.jsx';
+
   import { InfoOutlineIcon } from '@chakra-ui/icons'
   import {
     Box,
@@ -41,9 +19,6 @@ import {
     Button,
   } from '@chakra-ui/react';
   
-  import { CloseIcon } from '@chakra-ui/icons'
-  
-  import Popup from 'reactjs-popup';
   import '../resources/style.css';
   import 'reactjs-popup/dist/index.css';
 

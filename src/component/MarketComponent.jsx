@@ -10,9 +10,8 @@ import {
 } from "@suiet/wallet-kit";
 
 import { BiSearchAlt } from 'react-icons/bi';
-import { TransactionBlock } from "@mysten/sui.js";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import {
     salePuddleShares,
@@ -22,7 +21,6 @@ import {
 } from "../resources/sui_api.js";
 
 import axios from 'axios';
-import ItemComponent from './SalingItemComponent.jsx';
 import { InfoOutlineIcon } from '@chakra-ui/icons'
 import {
     Box,
@@ -59,10 +57,10 @@ export default function MarketComponent() {
 
     const ThStyle = {
         fontSize: '24px',
-        color: 'darkorchid',
+        color: 'deepskyblue',
     }
 
-    const WalletTableStyle = {
+    const TableStyle = {
         backgroundColor: '#111524',
         border: '1px solid darkgoldenrod',
         padding: '20px',
@@ -110,17 +108,17 @@ export default function MarketComponent() {
         }
     }, [wallet.connected]);
 
-    const getFundsData = useCallback(() => {
+    function getFundsData() {
         getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'market').then(resp => {
             setPuddleStatistics(resp);
         });
-    });
+    }
 
-    const getYourInvsetFunds = useCallback(() => {
+    function getYourInvsetFunds() {
         getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
             setYourInvestItem(resp);
         });
-    });
+    }
 
     function handleSelectAction(e) {
         setSelectedPuddleId(e.target.value);
@@ -171,43 +169,29 @@ export default function MarketComponent() {
     }
 
     return (
-        <Box w={'100%'} h={'100%'} mt={'100px'}>
+        <Box w={'90%'} h={'100%'}>
             <Center w={'100%'}>
-                <Container maxW={'1200px'} w={'100%'}>
-
-                    <Flex
-                        px={'10px'} //padding-left, padding-right
-                        bg={{ base: '#FFF', md: '#FFF' }}
-                        h={'120px'}
-                        borderRadius={'20px'}
-                        boxShadow={'lg'}
-                    >
+                <Container maxW={'1310px'} w={'100%'}>
+                    <Flex>
                         <SimpleGrid
-                            rows={2}
+                            rows={1}
                             columns={2}
-                            spacing={50}
-                            mt={'40px'}
+                            spacing={100}
                             w={'100%'}
                         >
-                            {/*左上半邊的卡片 */}
+                            {/*左半邊的卡片 */}
                             <Box
-                                borderRadius={'20px'}
-                                borderWidth={'0.5px'}
-                                borderColor={'gold'}
-                                borderStyle={'solid'}
+                                style={TableStyle}
                             >
                                 <Center>
-                                    <Text
-                                        fontSize={'30px'}
-                                        style={{ ...ThStyle }}>
-                                        Sale Shares
-                                    </Text>
+                                    <h1 style={{ color: 'gold' }}>Sale Shares</h1>
                                 </Center>
                                 <Center>
                                     <Card
-                                        borderRadius={'20px'}
-                                        bg={'#7D7DFF'}
-                                        width={'90%'}
+                                        border={'1px solid BurlyWood'}
+                                        borderRadius={'2px'}
+                                        bg={'black'}
+                                        width={'80%'}
                                         mb={'20px'}
                                     >
                                         <CardBody>
@@ -217,7 +201,7 @@ export default function MarketComponent() {
                                                     <b>Puddle: </b>
                                                 </Text>
                                                 <Select
-                                                    borderRadius={'20px'}
+                                                    borderRadius={'2px'}
                                                     bg='#919fc6'
                                                     color='white'
                                                     size='lg'
@@ -248,7 +232,7 @@ export default function MarketComponent() {
                                                     <b>Amounts: </b>
                                                 </Text>
                                                 <NumberInput maxW='100px' mr='2rem' value={saleAmounts} onChange={(value) => setSaleAmounts(value)} >
-                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'20px'} />
+                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
                                                     <NumberInputStepper height={"40%"} mr={'5px'}>
                                                         <NumberIncrementStepper />
                                                         <NumberDecrementStepper />
@@ -279,7 +263,7 @@ export default function MarketComponent() {
                                                     <b>Price: </b>
                                                 </Text>
                                                 <NumberInput maxW='100px' ml={'30px'} value={salePrice} onChange={(value) => setSalePrice(value)} >
-                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'20px'} />
+                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
                                                     <NumberInputStepper height={"40%"} >
                                                         <NumberIncrementStepper />
                                                         <NumberDecrementStepper />
@@ -299,14 +283,7 @@ export default function MarketComponent() {
                                             <Center mt={'10px'} mb={'10px'}>
                                                 <Flex>
                                                     <Button
-                                                        width={'150px'}
-                                                        height={'50px'}
-                                                        color={'black'}
-                                                        bg='#b8d8e5'
-                                                        variant='solid'
-                                                        borderRadius={'20px'}
-                                                        size={'lg'}
-                                                        mr={'40px'}
+                                                        className="btn"
                                                         onClick={(e) => {
                                                             if (yourInvestItem.length > 0) {
                                                                 let share = yourInvestItem.filter(sh => sh.puddle.id.id == selectedPuddleId)[0];
@@ -314,32 +291,24 @@ export default function MarketComponent() {
                                                             }
                                                         }}
                                                     >Confirm to Sale</Button>
-                                                    <Button width={'150px'} height={'50px'} color={'black'} bg='#fac7d3' variant='solid' borderRadius={'20px'} size={'lg'} ml={'40px'}>Reset</Button>
+                                                    <Button className="btn" style={{ marginLeft: '10px' }}>Reset</Button>
                                                 </Flex>
                                             </Center>
                                         </CardBody>
                                     </Card>
                                 </Center>
                             </Box>
-                            {/*右上半邊的卡片 */}
+                            {/*右半邊的卡片 */}
                             <Box
-                                borderRadius={'20px'}
-                                borderWidth={'0.5px'}
-                                borderColor={'gold'}
-                                borderStyle={'solid'}
-                                overflow={'scroll'}
+                                style={TableStyle}
                             >
                                 <Center>
-                                    <Text
-                                        fontSize={'30px'}
-                                        style={{ ...ThStyle }}>
-                                        Buy Shares
-                                    </Text>
+                                    <h1 style={{ color: 'gold' }}>Buy Shares</h1>
                                 </Center>
                                 <Center mt={'10px'} mb={'15px'}>
                                     <Input
                                         placeholder={'Puddle Name..'}
-                                        width={'400px'}
+                                        width={'360px'}
                                         bg={'#dfdcd5'}
                                         color={'black'}
                                         value={searchKeyword}
@@ -348,14 +317,7 @@ export default function MarketComponent() {
 
                                     <Button
                                         leftIcon={<BiSearchAlt />}
-                                        colorScheme='teal'
-                                        variant='solid'
-                                        bg='#fac7d3'
-                                        borderRadius={'20px'}
-                                        width={'100px'}
-                                        height={'40px'}
-                                        ml={'5px'}
-                                        color={'black'}
+                                        className="btn" style={{ marginLeft: '10px' }}
                                     >Search</Button>
 
                                 </Center>
@@ -367,12 +329,11 @@ export default function MarketComponent() {
                                                 return (
                                                     <Center mb={'15px'}>
                                                         <Card
-                                                            borderRadius={'20px'}
-                                                            borderWidth={'1px'}
-                                                            borderColor={'#b8d8e5'}
-                                                            borderStyle={'solid'}
-                                                            bg={'#7D7DFF'}
-                                                            width={'90%'}>
+                                                            border={'1px solid BurlyWood'}
+                                                            borderRadius={'2px'}
+                                                            bg={'black'}
+                                                            width={'80%'}
+                                                            mb={'20px'} >
                                                             <CardBody>
                                                                 <Center>
                                                                     <Flex>
@@ -407,13 +368,7 @@ export default function MarketComponent() {
                                                                 <Center>
                                                                     <Flex >
                                                                         <Button
-                                                                            width={'150px'}
-                                                                            height={'50px'}
-                                                                            color={'black'}
-                                                                            bg='#b8d8e5'
-                                                                            variant='solid'
-                                                                            borderRadius={'20px'}
-                                                                            size={'lg'}
+                                                                            className="btn" marginBottom={'10px'}
                                                                             onClick={(e) => {
                                                                                 buyShares(item, puddle);
                                                                             }}
@@ -431,11 +386,6 @@ export default function MarketComponent() {
                                     }
                                     )}
                             </Box>
-                            {/*左下半邊的卡片 */}
-                            <Box></Box>
-                            {/*右下半邊的卡片 */}
-                            <Box></Box>
-
                         </SimpleGrid>
 
                     </Flex>

@@ -9,18 +9,6 @@ import {
     useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import { TransactionBlock } from "@mysten/sui.js";
-
-import { useState, useEffect, useRef, useCallback } from 'react';
-
-import {
-    getYourFundItems,
-    createPuddle,
-    modifyPuddle,
-} from "../resources/sui_api.js";
-
-import axios from 'axios';
-
 import {
     Table,
     Thead,
@@ -31,47 +19,96 @@ import {
     Td,
     TableCaption,
     TableContainer,
-    Tab,
-    Icon,
+    GridItem,
+    Grid
+} from '@chakra-ui/react'
+
+import { useState, useEffect, useRef } from 'react';;
+import { Chart } from "react-google-charts";
+
+import {
+    getYourFundItems,
+    createPuddle,
+    modifyPuddle,
+} from "../resources/sui_api.js";
+
+// import { createColumnHelper } from "@tanstack/react-table"
+// import DataTableComponent from './DataTableComponent';
+
+import axios from 'axios';
+
+import {
+    Box,
+    Container,
+    Flex,
+    Center,
+    SimpleGrid,
+    Card,
+    CardBody,
+    Text,
+    NumberInput,
+    Tooltip,
+    Select,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
+    Button,
+    Alert,
+    AlertIcon,
     Input,
-    position,
+    Spacer,
+    Square,
+    VStack,
+    Stack
 } from '@chakra-ui/react';
 
-import { CloseIcon } from '@chakra-ui/icons'
-
-import Popup from 'reactjs-popup';
 import '../resources/style.css';
 import 'reactjs-popup/dist/index.css';
 
-export default function WalletComponent() {
+export const data = [
+    ["Type", "Amount", "Cost", "Value"],
+    ["CETUS", 6000, 1000, 4000],
+    ["USDT", 30000, 2000, 3000],
+    ["TURBOS", 2000, 3000, 1000],
+    ["SUI", 4000, 2000, 8000],
+    ["aaa", 4000, 2000, 8000],
+    ["bbb", 4000, 2000, 8000],
+    ["ccc", 4000, 2000, 8000],
+    ["ddd", 4000, 2000, 8000],
+    ["eee", 4000, 2000, 8000],
+    ["fff", 4000, 2000, 8000],
+    ["ggg", 4000, 2000, 8000]
+];
 
-    const PuddlStyle = {
+export default function WalletComponent() {
+    const walletStyle = {
         textAlign: 'center'
     }
 
-    const PuddleTableStyle = {
+    const DashboardTableStyle = {
         backgroundColor: '#111524',
         border: '1px solid darkgoldenrod',
-        padding: '20px',
+        padding: '5px',
         borderRadius: '18px',
         width: '80vw',
-        margin: '15px',
         display: 'inline-table',
     }
 
-    const FundTableStyle = {
+    const puddleSettingTableStyle = {
         backgroundColor: '#111524',
         border: '1px solid darkgoldenrod',
-        padding: '20px',
+        padding: '5px',
         borderRadius: '18px',
-        width: '45vw',
-        margin: '15px',
+        width: '65vw',
+        hight: '5vw',
+        margin: '10px',
         display: 'inline-table',
     }
 
     const ThStyle = {
         fontSize: '24px',
-        color: 'darkorchid',
+        color: 'deepskyblue',
     }
 
     const TdStyle = {
@@ -85,6 +122,37 @@ export default function WalletComponent() {
     const displayNone = {
         display: 'none'
     }
+
+    const pieChartOptions = {
+        backgroundColor: "transparent",
+        width: "30vw",
+        hight: "50vw",
+        fontSize: "16",
+        is3D: true,
+        legend: { position: 'right', textStyle: { color: 'white', fontSize: 16 } },
+        pieHole: '0.4',
+        chartArea: { width: '70%', height: '100%' }
+    };
+
+    const tableChartOptions = {
+        is3D: true,
+        backgroundColor: "transparent",
+        width: "45vw",
+        hight: "50vw",
+        pageSize: 8,
+        cssClassNames: {
+            headerRow: 'headerRowClass',
+            tableRow: 'tableRowClass',
+            oddTableRow: 'oddTableRowClass',
+            selectedTableRow: 'selectedTableRowClass',
+            hoverTableRow: 'hoverTableRowClass',
+            headerCell: 'headerCellClass',
+            tableCell: 'tableCellClass'
+        },
+        chartArea: { width: '100%', height: '90%' }
+    };
+
+
 
     function timestampChange(timestamp) {
         if (timestamp == 0) {
@@ -192,10 +260,84 @@ export default function WalletComponent() {
     }
 
     return (
-        <div className="puddle" style={PuddlStyle}>
-            <h2 style={{ color: 'gold'}}>
-                To Be Continue ...
-            </h2>
-        </div >
+        <div className="wallet" style={walletStyle}>
+            <Center>
+                <Flex>
+                    <Box>
+                        <Text
+                            style={{ ...ThStyle }}>
+                            Select Puddle
+                        </Text>
+                        <Select
+                            borderRadius={'2px'}
+                            bg='#919fc6'
+                            color='white'
+                            size='md'
+                            width={'150px'}
+                            height={'40px'}
+                            value={'selectedPuddleId'}
+                            onChange={(e) => handleSelectAction(e)}
+                            margin={'35px'}
+                            placeholder="Select Puddle...">
+                        </Select>
+                    </Box>
+
+
+                    <div style={puddleSettingTableStyle}>
+                        <h1 style={{ color: 'gold' }}>Transaction Setting</h1>
+                        <VStack>
+                            <Select
+                                borderRadius={'2px'}
+                                bg='#919fc6'
+                                color='white'
+                                size='lg'
+                                width={'150px'}
+                                height={'40px'}
+                                value={'selectedPuddleId'}
+                                onChange={(e) => handleSelectAction(e)}
+                                placeholder="Select Cion Type..." />
+                            <NumberInput width={'400px'} margin={'5px'}>
+                                <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                <NumberInputStepper height={"40%"} mr={'5px'}>
+                                    <NumberIncrementStepper />
+                                    <NumberDecrementStepper />
+                                </NumberInputStepper>
+                            </NumberInput>
+                            <Flex margin={'10px'}>
+                                <Button
+                                    className="btn"
+                                    onClick={(e) => {
+                                        if (yourInvestItem.length > 0) {
+                                            let share = yourInvestItem.filter(sh => sh.puddle.id.id == selectedPuddleId)[0];
+                                            saleShares(share);
+                                        }
+                                    }}
+                                >Reset</Button>
+                                <Button className="btn" style={{ marginLeft: '10px' }}>Submit</Button>
+                            </Flex>
+                        </VStack>
+                    </div>
+                </Flex>
+            </Center>
+            <div style={DashboardTableStyle}>
+                <h1 style={{ color: 'gold' }}>Dashboard</h1>
+                <Flex>
+                    <Box marginBottom={'20px'}>
+                        <Chart
+                            chartType="PieChart"
+                            data={data}
+                            options={pieChartOptions}
+                        />
+                    </Box>
+                    <Box marginBottom={'20px'}>
+                        <Chart
+                            chartType="Table"
+                            data={data}
+                            options={tableChartOptions}
+                        />
+                    </Box>
+                </Flex>
+            </div>
+        </div>
     );
 }

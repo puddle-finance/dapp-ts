@@ -23,7 +23,7 @@ import {
     Grid
 } from '@chakra-ui/react'
 
-import { useState, useEffect, useRef } from 'react';;
+import { useState, useEffect, useRef, useCallback } from 'react';;
 import { Chart } from "react-google-charts";
 
 import {

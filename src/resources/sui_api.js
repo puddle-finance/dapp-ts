@@ -1,18 +1,20 @@
-const Puddle_Package_ID = "0x727ce1d17ad799557e36756bcf9072eefc4826e6d2d18915bb2e9476dfba7675";
+const Puddle_Package_ID = "0xe9ea8cf9316c4a5fb871ad7c004369ada4b9b2af672c3e01d958a01fff43c28b";
 const Puddle_Module = "puddle";
 const Puddle_Gas_Budget = "100000000";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
-const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShares";
-const PuddleStatistics = "0xdacd23ce2857df4c8748dd295f9652fef7e56404d2c45482e2a3c1bdd8646848";
+const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
+const PuddleStatistic = "0x722b08d8174d8969f79631995fe234dbe75fc5f8892fed9b62818ca96518d1b8";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
+
+const cetus_global_config_id = "0x6f4149091a5aea0e818e7243a13adcfb403842d670b9a2089de058512620687a";
 
 import { testnetConnection, JsonRpcProvider, TransactionBlock } from "@mysten/sui.js";
 
 const provider = new JsonRpcProvider(testnetConnection);
 
-async function getPuddleById(axios, apiurl, puddleId, investUserAddress, isGetHolderInfo, isGetMarketInfo, isGetInvestments) {
+async function getPuddleById(puddleId, investUserAddress, isGetHolderInfo, isGetMarketInfo, isGetInvestments) {
 
     let response = await provider.getObject({
         id: puddleId,
@@ -51,11 +53,12 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress, isGetHo
         puddleObj.metadata = obj.metadata.fields;
 
         if (isGetHolderInfo) {
+
             puddleObj.holder_info = {
                 "holders": obj.holder_info.fields.holders,
                 "holders_count": obj.holder_info.fields.holders.length
             };
-            getTableKeyValue(axios, apiurl, obj.holder_info.fields.holder_amount_table.fields.id.id).then(rep => {
+            getTableKeyValue(obj.holder_info.fields.holder_amount_table.fields.id.id).then(rep => {
                 puddleObj.holder_info.holder_amount_table = rep;
             });
 
@@ -70,7 +73,7 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress, isGetHo
         if (isGetMarketInfo) {
             let item_arr = []
             for (let i = 0; i < obj.market_info.fields.items.length; i++) {
-                await getItemById(axios, apiurl, obj.market_info.fields.items[i]).then(resp => {
+                await getItemById(obj.market_info.fields.items[i]).then(resp => {
                     item_arr.push(resp);
                 })
             }
@@ -78,7 +81,7 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress, isGetHo
                 "items": item_arr,
                 "items_count": obj.market_info.fields.items.length
             };
-            getTableKeyValue(axios, apiurl, obj.market_info.fields.item_listing_table.fields.id.id).then(rep => {
+            getTableKeyValue(obj.market_info.fields.item_listing_table.fields.id.id).then(rep => {
                 puddleObj.market_info.item_listing_table = rep;
             });
         }
@@ -86,19 +89,33 @@ async function getPuddleById(axios, apiurl, puddleId, investUserAddress, isGetHo
         if (isGetInvestments) {
             puddleObj.investments = {
                 "total_rewards": obj.investments.fields.total_rewards,
-                "invests": obj.investments.fields.invests,
+                // "invests": obj.investments.fields.invests,
                 "invests_count": obj.investments.fields.invests.length
             }
-            getTableKeyValue(axios, apiurl, obj.investments.fields.cost_table.fields.id.id).then(rep => {
-                puddleObj.investments.cost_table = rep;
+            let cost_table = await getTableKeyValue(obj.investments.fields.cost_table.fields.id.id).then(rep => {
+                return rep;
             });
+            let balance_bag = await getTableKeyValue(obj.investments.fields.balance_bag.fields.id.id).then(rep => {
+                return rep;
+            });
+
+            let invests = [];
+            for (let investsAddress of obj.investments.fields.invests){
+                let obj = new Object();
+                obj.investsAddress = investsAddress;
+                obj.cost_sui = cost_table.get(investsAddress);
+                obj.balance_amount = balance_bag.get(investsAddress);
+                invests.push(obj);
+            }
+            puddleObj.investments.invests = invests;
+
         }
     }
     //console.log(puddleObj)
     return puddleObj;
 }
 
-async function getTableKeyValue(axios, apiurl, fieldId) {
+async function getTableKeyValue(fieldId) {
 
     let response = await provider.getDynamicFields({
         parentId: fieldId,
@@ -115,7 +132,7 @@ async function getTableKeyValue(axios, apiurl, fieldId) {
             let type = obj.name.type;
             let value = obj.name.value;
 
-            await getFieldObject(axios, apiurl, fieldId, type, value).then(rep => {
+            await getFieldObject(fieldId, type, value).then(rep => {
                 for (let [key, value] of rep) {
                     tableMap.set(key, value);
                 }
@@ -125,7 +142,7 @@ async function getTableKeyValue(axios, apiurl, fieldId) {
     return tableMap;
 }
 
-async function getFieldObject(axios, apiurl, fieldId, type, value) {
+async function getFieldObject(fieldId, type, value) {
 
     let response = await provider.getDynamicFieldObject({
         parentId: fieldId,
@@ -148,7 +165,7 @@ async function getFieldObject(axios, apiurl, fieldId, type, value) {
     return tableMap;
 }
 
-async function getPuddleSharesByWallet(axios, apiurl, walletAddress, structType) {
+async function getPuddleSharesByWallet(walletAddress, structType) {
 
     let ownedObject = {
         owner: walletAddress,
@@ -178,18 +195,18 @@ async function getPuddleSharesByWallet(axios, apiurl, walletAddress, structType)
     return response;
 }
 
-export async function getYourFundItems(axios, apiurl, walletAddress) {
+export async function getYourFundItems(walletAddress) {
 
     let puddleArr = new Array();
-    let response = await getPuddleSharesByWallet(axios, apiurl, walletAddress, PuddleCapType);
+    let response = await getPuddleSharesByWallet(walletAddress, PuddleCapType);
 
     if (response.data) {
         for (let i = 0; i < response.data.length; i++) {
             let obj = response.data[i];
             let objContent = obj.data.content.fields;
             let puddleObj = new Object();
-            puddleObj.id = objContent.id.id;
-            await getPuddleById(axios, apiurl, objContent.puddle_id, walletAddress, true, false, false).then(rep => {
+            puddleObj.puddleCapId = objContent.id.id;
+            await getPuddleById(objContent.puddle_id, walletAddress, true, false, true).then(rep => {
                 puddleObj.puddle = rep;
             });
             puddleArr.push(puddleObj);
@@ -201,7 +218,7 @@ export async function getYourFundItems(axios, apiurl, walletAddress) {
         return puddleArr;
     }
 }
-export async function getItemById(axios, apiurl, itemId) {
+export async function getItemById(itemId) {
 
     let response = await provider.getObject({
         id: itemId,
@@ -237,9 +254,9 @@ export async function getItemById(axios, apiurl, itemId) {
     return itemObj;
 }
 
-export async function getYourInvestItems(axios, apiurl, walletAddress) {
+export async function getYourInvestItems(walletAddress) {
 
-    let response = await getPuddleSharesByWallet(axios, apiurl, walletAddress, PuddleSharesType);
+    let response = await getPuddleSharesByWallet(walletAddress, PuddleSharesType);
     let puddleArr = new Array();
 
     let puddleMap = new Map();
@@ -249,7 +266,7 @@ export async function getYourInvestItems(axios, apiurl, walletAddress) {
             let obj = response.data[i];
             let objContent = obj.data.content.fields;
             let puddleObj = null;
-            await getPuddleById(axios, apiurl, objContent.puddle_id, walletAddress, false, false, false).then(rep => {
+            await getPuddleById(objContent.puddle_id, walletAddress, false, false, false).then(rep => {
                 if (puddleMap.get(rep.id.id)) {
                     puddleObj = puddleMap.get(rep.id.id);
                     puddleObj.shares = Number(puddleObj.shares) + Number(objContent.shares);
@@ -280,7 +297,7 @@ export async function getYourInvestItems(axios, apiurl, walletAddress) {
     return puddleArr;
 }
 
-export async function getPuddleStatistics(axios, apiurl, walletAddress, isGetInProgressPuddles, isGetClosedPuddles, isGetPuddleOwnerTable, pageType) {
+export async function getPuddleStatistics(walletAddress, isGetInProgressPuddles, isGetClosedPuddles, isGetPuddleOwnerTable, pageType) {
 
     let isGetHolderInfo, isGetMarketInfo, isGetInvestments = false;
     if (pageType === 'invest') {
@@ -290,7 +307,7 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress, isGetInP
     }
 
     let response = await provider.getObject({
-        id: PuddleStatistics,
+        id: PuddleStatistic,
         options: {
             showType: true,
             showOwner: true,
@@ -307,8 +324,10 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress, isGetInP
         if (isGetInProgressPuddles) {
             let in_progress_puddles = [];
             for (let i = 0; i < obj.in_progress_puddles.length; i++) {
-                await getPuddleById(axios, apiurl, obj.in_progress_puddles[i], walletAddress, isGetHolderInfo, isGetMarketInfo, isGetInvestments).then(rep => {
-                    in_progress_puddles.push(rep);
+                await getPuddleById(obj.in_progress_puddles[i], walletAddress, isGetHolderInfo, isGetMarketInfo, isGetInvestments).then(rep => {
+                    if (rep.metadata.trader !== walletAddress){
+                        in_progress_puddles.push(rep);
+                    }
                 });
             }
             puddleStatisticsObj.in_progress_puddles = in_progress_puddles;
@@ -317,7 +336,7 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress, isGetInP
         if (isGetClosedPuddles) {
             let closed_puddles = [];
             for (let i = 0; i < obj.closed_puddles.length; i++) {
-                await getPuddleById(axios, apiurl, obj.closed_puddles[i], walletAddress, isGetHolderInfo, isGetMarketInfo, isGetInvestments).then(rep => {
+                await getPuddleById(obj.closed_puddles[i], walletAddress, isGetHolderInfo, isGetMarketInfo, isGetInvestments).then(rep => {
                     closed_puddles.push(rep);
                 });
             }
@@ -325,7 +344,7 @@ export async function getPuddleStatistics(axios, apiurl, walletAddress, isGetInP
         }
 
         if (isGetPuddleOwnerTable) {
-            await getTableKeyValue(axios, apiurl, obj.puddle_owner_table.fields.id.id).then(rep => {
+            await getTableKeyValue(obj.puddle_owner_table.fields.id.id).then(rep => {
                 puddleStatisticsObj.puddle_owner_table = rep;
             });
         }
@@ -370,7 +389,7 @@ export async function depositPuddleShares(wallet, coin_type, puddle_id, amount, 
         let [coins] = txObj.splitCoins(txObj.gas, [txObj.pure(amount_coin)]);
 
         let args = [
-            txObj.object(puddle_id),
+            txObj.pure(puddle_id),
             txObj.pure(BigInt(Number(amount) * Number(coin_decimals))),
             coins,
         ];
@@ -415,8 +434,8 @@ export async function buyPuddleShares(wallet, coin_type, puddle_id, product_id, 
         let [coins] = txObj.splitCoins(txObj.gas, [txObj.pure(amount_coin)]);
 
         let args = [
-            txObj.object(puddle_id),
-            txObj.object(product_id),
+            txObj.pure(puddle_id),
+            txObj.pure(product_id),
             coins,
         ];
 
@@ -461,7 +480,7 @@ export async function salePuddleShares(wallet, coin_type, puddle_id, shares_id, 
     if (!same) {
 
         args = [
-            txObj.object(shares_id),
+            txObj.pure(shares_id),
             txObj.pure(BigInt(Number(amount))),
         ];
 
@@ -473,8 +492,8 @@ export async function salePuddleShares(wallet, coin_type, puddle_id, shares_id, 
             txObj = new TransactionBlock();
 
             args = [
-                txObj.object(puddle_id),
-                txObj.object(shares_id),
+                txObj.pure(puddle_id),
+                txObj.pure(shares_id),
                 txObj.pure(BigInt(Number(price))),
             ];
 
@@ -486,8 +505,8 @@ export async function salePuddleShares(wallet, coin_type, puddle_id, shares_id, 
         txObj = new TransactionBlock();
 
         args = [
-            txObj.object(puddle_id),
-            txObj.object(shares_id),
+            txObj.pure(puddle_id),
+            txObj.pure(shares_id),
             txObj.pure(BigInt(Number(price))),
         ];
 
@@ -539,6 +558,8 @@ export async function getCoinArr(axios, apiurl, walletAddress, coin_type) {
         ]
     };
 
+    provider.getAllCoins();
+
     let response = await axios.post(apiurl, reqdata);
     if (response.data.result.data) {
         let coinArr = [];
@@ -569,9 +590,9 @@ export async function createPuddle(wallet, coin_type, name, desc, commissionPerc
     }
 
     let args = [
-        txObj.object(PuddleStatistics),
+        txObj.pure(PuddleStatistic),
         txObj.pure(BigInt(Number(maxSupply) * Number(coin_decimals))),
-        txObj.object(trader),
+        txObj.pure(trader),
         txObj.pure(Number(commissionPercentage)),
         txObj.pure(name),
         txObj.pure(desc),
@@ -651,4 +672,33 @@ export async function modifyPuddle(wallet, puddle, coin_type, name, desc, commis
     } catch (e) {
         console.error('failed', e);
     }
+}
+
+export async function cetusInvest(wallet, puddleCapId, puddleId, poolDetail, amount) {
+
+    let sqrt_price_limit = "79226673515401279992447579055";
+    let clockId = "0x0000000000000000000000000000000000000000000000000000000000000006";
+
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(poolDetail.coinTypeA);
+    type_args.push(poolDetail.coinTypeB);
+
+    let args = [
+        txObj.pure(puddleCapId),
+        txObj.pure(puddleId),
+        txObj.pure(cetus_global_config_id),
+        txObj.pure(poolDetail.poolAddress),
+        txObj.pure(amount),
+        txObj.pure(sqrt_price_limit),
+        txObj.pure(clockId),
+    ];
+
+    handleSignTransaction(wallet, "invest", txObj, type_args, args, true);
+}
+
+export async function getCoinMetadata(coinType) {
+    let coinMetaData = await provider.getCoinMetadata({coinType: coinType});
+    return coinMetaData;
 }

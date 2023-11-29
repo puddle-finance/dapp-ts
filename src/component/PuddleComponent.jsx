@@ -17,6 +17,10 @@ import {
   modifyPuddle,
 } from "../resources/sui_api.js";
 
+import {getCetusCoinTypeSelectArray} from "../resources/cetus_api.js";
+
+getCetusCoinTypeSelectArray();
+
 import axios from 'axios';
 
 import {
@@ -137,7 +141,7 @@ export default function WalletComponent() {
   }, [wallet.connected]);
 
   const getYourPuddlesData = useCallback(() => {
-    getYourFundItems(axios, apiurl, wallet.account.address).then(resp => {
+    getYourFundItems(wallet.account.address).then(resp => {
       setYourPuddles(resp);
     });
   });

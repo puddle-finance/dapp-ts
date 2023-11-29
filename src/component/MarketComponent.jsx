@@ -109,13 +109,13 @@ export default function MarketComponent() {
     }, [wallet.connected]);
 
     function getFundsData() {
-        getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'market').then(resp => {
+        getPuddleStatistics(wallet.account.address, true, false, false, 'market').then(resp => {
             setPuddleStatistics(resp);
         });
     }
 
     function getYourInvsetFunds() {
-        getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
+        getYourInvestItems(wallet.account.address).then(resp => {
             setYourInvestItem(resp);
         });
     }

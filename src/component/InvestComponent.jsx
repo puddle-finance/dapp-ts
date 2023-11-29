@@ -127,7 +127,7 @@ export default function WalletComponent() {
         setSuiexplor(SUI_TESTNET_SUIEXPLOR_URL);
       } else {
         setApiurl(SUI_MAINNET_API_URL);
-        setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);getYourInvestItems
+        setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);
       }
       getYourInvsetFunds();
       getFundsData();
@@ -135,13 +135,13 @@ export default function WalletComponent() {
   }, [wallet.connected]);
   
   const getFundsData = useCallback(() => {
-    getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'invest').then(resp => {
+    getPuddleStatistics(wallet.account.address, true, false, false, 'invest').then(resp => {
           setPuddleStatistics(resp);
         });
   });
 
   const getYourInvsetFunds = useCallback(() => {
-    getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
+    getYourInvestItems(wallet.account.address).then(resp => {
       setYourInvestItem(resp);
     });
   });

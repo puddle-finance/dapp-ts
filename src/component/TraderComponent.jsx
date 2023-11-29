@@ -23,14 +23,18 @@ import {
     Grid
 } from '@chakra-ui/react'
 
-import { useState, useEffect, useRef, useCallback } from 'react';;
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Chart } from "react-google-charts";
 
 import {
     getYourFundItems,
     createPuddle,
     modifyPuddle,
+    cetusInvest,
+    getCoinMetadata
 } from "../resources/sui_api.js";
+
+import { getCetusCoinTypeSelectArray, getPreSwap, getPoolDetail } from "../resources/cetus_api.js";
 
 // import { createColumnHelper } from "@tanstack/react-table"
 // import DataTableComponent from './DataTableComponent';
@@ -65,21 +69,7 @@ import {
 
 import '../resources/style.css';
 import 'reactjs-popup/dist/index.css';
-
-export const data = [
-    ["Type", "Amount", "Cost", "Value"],
-    ["CETUS", 6000, 1000, 4000],
-    ["USDT", 30000, 2000, 3000],
-    ["TURBOS", 2000, 3000, 1000],
-    ["SUI", 4000, 2000, 8000],
-    ["aaa", 4000, 2000, 8000],
-    ["bbb", 4000, 2000, 8000],
-    ["ccc", 4000, 2000, 8000],
-    ["ddd", 4000, 2000, 8000],
-    ["eee", 4000, 2000, 8000],
-    ["fff", 4000, 2000, 8000],
-    ["ggg", 4000, 2000, 8000]
-];
+import { CoinMetadataStruct, SUI_DECIMALS } from "@mysten/sui.js";
 
 export default function WalletComponent() {
     const walletStyle = {
@@ -152,8 +142,6 @@ export default function WalletComponent() {
         chartArea: { width: '100%', height: '90%' }
     };
 
-
-
     function timestampChange(timestamp) {
         if (timestamp == 0) {
             return "N/A";
@@ -182,14 +170,25 @@ export default function WalletComponent() {
     const [apiurl, setApiurl] = useState(SUI_TESTNET_API_URL);
     const [suiexplor, setSuiexplor] = useState();
     const [yourPuddles, setYourPuddles] = useState(new Array());
+    const [selectedPuddleId, setSelectedPuddleId] = useState('');
+    const [puddleMap, setPuddleMap] = useState(new Map());
 
     const [maxSupply, setMaxSupply] = useState(0);
     const [trader, setTrader] = useState("");
     const [commissionPercentage, setCommissionPercentage] = useState("");
     const [name, setName] = useState("");
     const [desc, setDesc] = useState("");
-    const [coinType, setCoinType] = useState("0x2::sui::SUI");
-    const [puddleObj, setPuddleObj] = useState(new Object());
+    const [coinType, setCoinType] = useState("");
+
+    const [cetusPoolAddress, setCetusPoolAddress] = useState("");
+    const [cetusCoinTypeSelect, setCetusCoinTypeSelect] = useState();
+    const [cetusCoinBalanceMap, setCetusCoinBalanceMap] = useState(new Map());
+
+    const [amount, setAmount] = useState();
+    const [preSwapAmount, setPreSwapAmount] = useState();
+
+    const [investMap, setInvestMap] = useState();
+    const [investData, setInvestData] = useState([]);
 
     useEffect(() => {
         if (wallet.connected) {
@@ -204,59 +203,104 @@ export default function WalletComponent() {
                 setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);
             }
             getYourPuddlesData();
+            getCetusCoinTypeSelect();
         }
     }, [wallet.connected]);
 
     const getYourPuddlesData = useCallback(() => {
-        getYourFundItems(axios, apiurl, wallet.account.address).then(resp => {
+        getYourFundItems(wallet.account.address).then(resp => {
+            let puddle_map = new Map();
+            let investMap = new Map();
+            for (let puddle of resp) {
+                let investArray = [];
+                investMap.set(puddle.puddle.id.id, investArray);
+                puddle_map.set(puddle.puddle.id.id, puddle);
+                let title = ["Type", "Total Supply", "Cost (SUI)", "Amount"];
+                investArray.push(title);
+                let investsArray = puddle.puddle.investments.invests;
+                for (let investObj of investsArray){
+                    getPoolDetail(investObj.investsAddress).then(poolDetail => {
+                        getCoinMetadata(poolDetail.coinTypeA).then(CoinMetadata => {
+                            let investDetailArray = new Array();
+                            let symbol = CoinMetadata.symbol;
+                            let deciamls = CoinMetadata.decimals;
+                            let total_supply = Number(poolDetail.coinAmountA) / (10 ** deciamls);
+                            let cost_sui = Number(investObj.cost_sui) / (10 ** SUI_DECIMALS);
+                            let balance_amount = Number(investObj.balance_amount) / (10 ** deciamls);
+                            console.log("cost_sui = "+cost_sui);
+                            console.log("balance_amount = "+balance_amount);
+                            investDetailArray.push(symbol, total_supply, cost_sui, balance_amount);
+                            investArray.push(investDetailArray);
+                        });
+                    });
+                }
+            }
             setYourPuddles(resp);
+            setPuddleMap(puddle_map);
+            setInvestMap(investMap);
         });
     });
 
-    function inputMaxSupply(e) {
-        setMaxSupply(e.target.value);
+    function changeInvestData(puddleId){
+        if (puddleId === ""){
+            setInvestData([]);
+        }else {
+            setInvestData(investMap.get(puddleId));
+        }
     }
 
-    function inputTrader(e) {
-        setTrader(e.target.value);
+    const getCetusCoinTypeSelect = useCallback(() => {
+        getCetusCoinTypeSelectArray().then(resp => {
+            setCetusCoinTypeSelect(resp);
+            let coinBalanceMap = new Map();
+            for (let obj of resp) {
+                coinBalanceMap.set(obj.cetusPoolAddress, obj);
+            }
+            setCetusCoinBalanceMap(coinBalanceMap);
+        });
+    });
+
+    function handleSelectAction(e) {
+        setSelectedPuddleId(e.target.value);
+        changeInvestData(e.target.value);
     }
 
-    function inputCommissionPercentage(e) {
-        setCommissionPercentage(e.target.value);
+    function handleSelectCoinTypeAction(e) {
+        setCetusPoolAddress(e.target.value);
+        getPreSwapAmount(e.target.value, amount);
     }
 
-    function inputName(e) {
-        setName(e.target.value);
+    function handleAmountAction(e) {
+        console.log("e.target.value = " + e.target.value);
+        setAmount(e.target.value);
+        getPreSwapAmount(cetusPoolAddress, e.target.value);
     }
 
-    function inputDesc(e) {
-        setDesc(e.target.value);
+    function getPreSwapAmount(cetusPoolAddress, amount) {
+        console.log("amount = " + amount);
+        if (amount && amount !== '' && amount != 0 && cetusPoolAddress && cetusPoolAddress !== '') {
+            getPreSwap(cetusPoolAddress, true, amount).then(preSwapAmount => {
+                console.log("preSwapAmount = " + preSwapAmount);
+                setPreSwapAmount("PreSwap Amount : " + preSwapAmount);
+            }).catch(() => {
+                setPreSwapAmount("Number too large")
+            });
+        } else {
+            setPreSwapAmount("PreSwap Amount : " + 0);
+        }
     }
 
-    function inputCoinType(e) {
-        setCoinType(e.target.value);
-    }
-
-    function save() {
-        console.log("name = " + name);
-        console.log("desc = " + desc);
-        console.log("commissionPercentage = " + commissionPercentage);
-        console.log("trader = " + trader);
-        console.log("maxSupply = " + maxSupply);
-        console.log("coinType = " + coinType);
-
-        createPuddle(wallet, coinType, name, desc, commissionPercentage, trader, maxSupply);
-    }
-
-    function modify() {
-        console.log("name = " + name);
-        console.log("desc = " + desc);
-        console.log("commissionPercentage = " + commissionPercentage);
-        console.log("trader = " + trader);
-        console.log("coinType = " + coinType);
-        console.log("puddleObj = " + puddleObj);
-
-        modifyPuddle(wallet, puddleObj, coinType, name, desc, commissionPercentage, trader);
+    function submitTransactionSetting(){
+        getPoolDetail(cetusPoolAddress).then(poolDetail => {
+            let puddleCapId = puddleMap.get(selectedPuddleId).puddleCapId;
+            let puddleId = puddleMap.get(selectedPuddleId).puddle.id.id;
+            let realAmount = amount * (10 ** 9);
+            console.log("puddleCapId = "+puddleCapId);
+            console.log("puddleId = "+puddleId);
+            console.log("poolDetail = "+JSON.stringify(poolDetail));
+            console.log("realAmount = "+realAmount);
+            cetusInvest(wallet, puddleCapId, puddleId, poolDetail, realAmount);
+        })
     }
 
     return (
@@ -275,11 +319,24 @@ export default function WalletComponent() {
                             size='md'
                             width={'150px'}
                             height={'40px'}
-                            value={'selectedPuddleId'}
+                            value={selectedPuddleId}
                             onChange={(e) => handleSelectAction(e)}
                             margin={'35px'}
                             placeholder="Select Puddle...">
+                            {yourPuddles?.map(puddle => {
+                                return (
+                                    <option value={puddle?.puddle?.id.id}>
+                                        {puddle?.puddle?.metadata?.name}
+                                    </option>
+                                )
+                            })}
                         </Select>
+                        {
+                            selectedPuddleId != '' &&
+                            <Text>
+                                Puddle Balance : {Number(puddleMap.get(selectedPuddleId).puddle.balance) / (10 ** 9)} SUI
+                            </Text>
+                        }
                     </Box>
 
 
@@ -293,27 +350,49 @@ export default function WalletComponent() {
                                 size='lg'
                                 width={'150px'}
                                 height={'40px'}
-                                value={'selectedPuddleId'}
-                                onChange={(e) => handleSelectAction(e)}
-                                placeholder="Select Cion Type..." />
-                            <NumberInput width={'400px'} margin={'5px'}>
-                                <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                value={cetusPoolAddress}
+                                onChange={(e) => handleSelectCoinTypeAction(e)}
+                                placeholder="Select Cion Type...">
+                                {cetusCoinTypeSelect?.map(obj => {
+                                    return (
+                                        <option value={obj.cetusPoolAddress}>
+                                            {obj.symbol}
+                                        </option>
+                                    )
+                                })}
+
+                            </Select>
+                            <NumberInput width={'400px'} margin={'5px'} >
+                                <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} onInput={handleAmountAction} value={amount} />
                                 <NumberInputStepper height={"40%"} mr={'5px'}>
                                     <NumberIncrementStepper />
                                     <NumberDecrementStepper />
                                 </NumberInputStepper>
                             </NumberInput>
+
+                            {
+                                cetusPoolAddress !== ""
+                                &&
+                                <Text>
+                                    {/* SUI : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.suiCoinBalance} <br /> */}
+                                    ( {cetusCoinBalanceMap?.get(cetusPoolAddress)?.symbol} ) Supply : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.otherCoinBalance}
+                                </Text>
+                            }
+
+                            <Text color={preSwapAmount === "Number too large" ? 'red' : 'yellow'}>
+                                {preSwapAmount}
+                            </Text>
+
                             <Flex margin={'10px'}>
-                                <Button
+                                {/* <Button
                                     className="btn"
-                                    onClick={(e) => {
-                                        if (yourInvestItem.length > 0) {
-                                            let share = yourInvestItem.filter(sh => sh.puddle.id.id == selectedPuddleId)[0];
-                                            saleShares(share);
-                                        }
-                                    }}
-                                >Reset</Button>
-                                <Button className="btn" style={{ marginLeft: '10px' }}>Submit</Button>
+                                    onClick={resetTransactionSetting}
+                                >Reset</Button> */}
+                                <Button
+                                    className="btn" 
+                                    style={{ marginLeft: '10px' }}
+                                    onClick={submitTransactionSetting}
+                                >Submit</Button>
                             </Flex>
                         </VStack>
                     </div>
@@ -321,22 +400,29 @@ export default function WalletComponent() {
             </Center>
             <div style={DashboardTableStyle}>
                 <h1 style={{ color: 'gold' }}>Dashboard</h1>
-                <Flex>
-                    <Box marginBottom={'20px'}>
-                        <Chart
-                            chartType="PieChart"
-                            data={data}
-                            options={pieChartOptions}
-                        />
-                    </Box>
-                    <Box marginBottom={'20px'}>
-                        <Chart
+                {
+                    investData.length == 0 &&
+                    <Text>No Data</Text>
+                }
+                {
+                    investData.length > 0 &&
+                    <Flex>
+                        <Box marginBottom={'20px'}>
+                            <Chart
+                                chartType="PieChart"
+                                data={investData}
+                                options={pieChartOptions}
+                            />
+                        </Box>
+                        <Box marginBottom={'20px'}>
+                            <Chart
                             chartType="Table"
-                            data={data}
+                            data={investData}
                             options={tableChartOptions}
-                        />
-                    </Box>
-                </Flex>
+                            />
+                        </Box>
+                    </Flex>
+                }
             </div>
         </div>
     );

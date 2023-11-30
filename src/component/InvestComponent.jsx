@@ -9,7 +9,7 @@ import {
   useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import {
   getYourInvestItems,
@@ -127,24 +127,24 @@ export default function WalletComponent() {
         setSuiexplor(SUI_TESTNET_SUIEXPLOR_URL);
       } else {
         setApiurl(SUI_MAINNET_API_URL);
-        setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);getYourInvestItems
+        setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);
       }
       getYourInvsetFunds();
       getFundsData();
     }
   }, [wallet.connected]);
+  
+  const getFundsData = useCallback(() => {
+    getPuddleStatistics(wallet.account.address, true, false, false, 'invest').then(resp => {
+          setPuddleStatistics(resp);
+        });
+  });
 
-  function getFundsData() {
-    getPuddleStatistics(axios, apiurl, wallet.account.address, true, false, false, 'invest').then(resp => {
-      setPuddleStatistics(resp);
-    });
-  }
-
-  function getYourInvsetFunds() {
-    getYourInvestItems(axios, apiurl, wallet.account.address).then(resp => {
+  const getYourInvsetFunds = useCallback(() => {
+    getYourInvestItems(wallet.account.address).then(resp => {
       setYourInvestItem(resp);
     });
-  }
+  });
 
   const changePayAmount = (e) => {
     setPayAmount(e.target.value);

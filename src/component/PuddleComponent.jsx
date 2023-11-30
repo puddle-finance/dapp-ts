@@ -9,13 +9,17 @@ import {
   useSuiProvider,
 } from "@suiet/wallet-kit";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 import {
   getYourFundItems,
   createPuddle,
   modifyPuddle,
 } from "../resources/sui_api.js";
+
+import {getCetusCoinTypeSelectArray} from "../resources/cetus_api.js";
+
+getCetusCoinTypeSelectArray();
 
 import axios from 'axios';
 
@@ -136,11 +140,11 @@ export default function WalletComponent() {
     }
   }, [wallet.connected]);
 
-  function getYourPuddlesData() {
-    getYourFundItems(axios, apiurl, wallet.account.address).then(resp => {
+  const getYourPuddlesData = useCallback(() => {
+    getYourFundItems(wallet.account.address).then(resp => {
       setYourPuddles(resp);
     });
-  }
+  });
 
   function inputMaxSupply(e) {
     setMaxSupply(e.target.value);

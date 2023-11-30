@@ -147,8 +147,6 @@ export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
   const res = await TestnetSDK.RouterV2.getBestRouter(
     from, to, input_amount, byAmountIn, priceSplitPoint, partner, swapWithMultiPoolParams, orderSplit, externalRouter);
 
-  console.log("res = "+JSON.stringify(res));
-
   let outputAmount = Number(res.result.outputAmount) / Number(10 ** output_decimals) + " " + output_symbol;
   return outputAmount;
 }

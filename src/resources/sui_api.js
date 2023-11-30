@@ -3,6 +3,7 @@ const Puddle_Module = "puddle";
 const Puddle_Gas_Budget = "100000000";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
+const AdminTeamFunds = "0x7fc9c2d06e5c39d683009a475f4fe9b60016aa8038725acedd49fb1f62b418bb";
 const PuddleStatistic = "0x722b08d8174d8969f79631995fe234dbe75fc5f8892fed9b62818ca96518d1b8";
 
 const SUI_decimals = 1000000000;
@@ -701,4 +702,31 @@ export async function cetusInvest(wallet, puddleCapId, puddleId, poolDetail, amo
 export async function getCoinMetadata(coinType) {
     let coinMetaData = await provider.getCoinMetadata({coinType: coinType});
     return coinMetaData;
+}
+
+export async function cetusArbitrage(wallet, puddleCapId, puddleId, poolDetail, amount) {
+
+    let sqrt_price_limit = "4295048016";
+    let clockId = "0x0000000000000000000000000000000000000000000000000000000000000006";
+
+    let txObj = new TransactionBlock();
+
+    let type_args = [];
+    type_args.push(poolDetail.coinTypeA);
+    type_args.push(poolDetail.coinTypeB);
+
+    let args = [
+        txObj.pure(puddleCapId),
+        txObj.pure(puddleId),
+        txObj.pure(cetus_global_config_id),
+        txObj.pure(poolDetail.poolAddress),
+        txObj.pure(amount),
+        txObj.pure(sqrt_price_limit),
+        txObj.pure(clockId),
+        txObj.pure(AdminTeamFunds),
+    ];
+
+    console.log("args = "+JSON.stringify(args));
+
+    handleSignTransaction(wallet, "arbitrage", txObj, type_args, args, true);
 }

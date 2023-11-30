@@ -131,8 +131,8 @@ export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
   let output_decimals;
   let output_symbol;
 
+  let coinMetaData = await provider.getCoinMetadata({coinType: poolDetail.coinTypeA});
   if (isBuy){
-    let coinMetaData = await provider.getCoinMetadata({coinType: poolDetail.coinTypeA});
     input_decimals = SUI_DECIMALS;
     output_decimals = coinMetaData.decimals;
     output_symbol = coinMetaData.symbol;
@@ -146,6 +146,8 @@ export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
 
   const res = await TestnetSDK.RouterV2.getBestRouter(
     from, to, input_amount, byAmountIn, priceSplitPoint, partner, swapWithMultiPoolParams, orderSplit, externalRouter);
+
+  console.log("res = "+JSON.stringify(res));
 
   let outputAmount = Number(res.result.outputAmount) / Number(10 ** output_decimals) + " " + output_symbol;
   return outputAmount;

@@ -31,7 +31,8 @@ import {
     createPuddle,
     modifyPuddle,
     cetusInvest,
-    getCoinMetadata
+    getCoinMetadata,
+    cetusArbitrage
 } from "../resources/sui_api.js";
 
 import { getCetusCoinTypeSelectArray, getPreSwap, getPoolDetail } from "../resources/cetus_api.js";
@@ -183,6 +184,7 @@ export default function WalletComponent() {
     const [cetusPoolAddress, setCetusPoolAddress] = useState("");
     const [cetusCoinTypeSelect, setCetusCoinTypeSelect] = useState();
     const [cetusCoinBalanceMap, setCetusCoinBalanceMap] = useState(new Map());
+    const [cetusAction, setCetusAction] = useState("Buy");
 
     const [amount, setAmount] = useState();
     const [preSwapAmount, setPreSwapAmount] = useState();
@@ -215,7 +217,7 @@ export default function WalletComponent() {
                 let investArray = [];
                 investMap.set(puddle.puddle.id.id, investArray);
                 puddle_map.set(puddle.puddle.id.id, puddle);
-                let title = ["Type", "Total Supply", "Cost (SUI)", "Amount"];
+                let title = ["Type", "Amount", "Cost (SUI)", "Pool Total Supply"];
                 investArray.push(title);
                 let investsArray = puddle.puddle.investments.invests;
                 for (let investObj of investsArray){
@@ -229,7 +231,7 @@ export default function WalletComponent() {
                             let balance_amount = Number(investObj.balance_amount) / (10 ** deciamls);
                             console.log("cost_sui = "+cost_sui);
                             console.log("balance_amount = "+balance_amount);
-                            investDetailArray.push(symbol, total_supply, cost_sui, balance_amount);
+                            investDetailArray.push(symbol, balance_amount, cost_sui, total_supply);
                             investArray.push(investDetailArray);
                         });
                     });
@@ -276,13 +278,20 @@ export default function WalletComponent() {
         getPreSwapAmount(cetusPoolAddress, e.target.value);
     }
 
+    function handleCetusAction(e){
+        setCetusAction(e.target.value);
+        getPreSwapAmount(cetusPoolAddress, amount);
+    }
+
     function getPreSwapAmount(cetusPoolAddress, amount) {
         console.log("amount = " + amount);
         if (amount && amount !== '' && amount != 0 && cetusPoolAddress && cetusPoolAddress !== '') {
-            getPreSwap(cetusPoolAddress, true, amount).then(preSwapAmount => {
+            let isBuy = cetusAction === "Buy" ? true : false;
+            getPreSwap(cetusPoolAddress, isBuy, amount).then(preSwapAmount => {
                 console.log("preSwapAmount = " + preSwapAmount);
                 setPreSwapAmount("PreSwap Amount : " + preSwapAmount);
-            }).catch(() => {
+            }).catch((e) => {
+                console.log("e = " + e);
                 setPreSwapAmount("Number too large")
             });
         } else {
@@ -291,16 +300,31 @@ export default function WalletComponent() {
     }
 
     function submitTransactionSetting(){
-        getPoolDetail(cetusPoolAddress).then(poolDetail => {
-            let puddleCapId = puddleMap.get(selectedPuddleId).puddleCapId;
-            let puddleId = puddleMap.get(selectedPuddleId).puddle.id.id;
-            let realAmount = amount * (10 ** 9);
-            console.log("puddleCapId = "+puddleCapId);
-            console.log("puddleId = "+puddleId);
-            console.log("poolDetail = "+JSON.stringify(poolDetail));
-            console.log("realAmount = "+realAmount);
-            cetusInvest(wallet, puddleCapId, puddleId, poolDetail, realAmount);
-        })
+        if (cetusAction === "Buy"){
+            getPoolDetail(cetusPoolAddress).then(poolDetail => {
+                let puddleCapId = puddleMap.get(selectedPuddleId).puddleCapId;
+                let puddleId = puddleMap.get(selectedPuddleId).puddle.id.id;
+                let realAmount = amount * (10 ** 9);
+                console.log("puddleCapId = "+puddleCapId);
+                console.log("puddleId = "+puddleId);
+                console.log("poolDetail = "+JSON.stringify(poolDetail));
+                console.log("realAmount = "+realAmount);
+                cetusInvest(wallet, puddleCapId, puddleId, poolDetail, realAmount);
+            })
+        } else {
+            getPoolDetail(cetusPoolAddress).then(poolDetail => {
+                getCoinMetadata(poolDetail.coinTypeA).then(CoinMetadata => {
+                    let puddleCapId = puddleMap.get(selectedPuddleId).puddleCapId;
+                    let puddleId = puddleMap.get(selectedPuddleId).puddle.id.id;
+                    let realAmount = amount * (10 ** CoinMetadata.decimals);
+                    console.log("puddleCapId = "+puddleCapId);
+                    console.log("puddleId = "+puddleId);
+                    console.log("poolDetail = "+JSON.stringify(poolDetail));
+                    console.log("realAmount = "+realAmount);
+                    cetusArbitrage(wallet, puddleCapId, puddleId, poolDetail, realAmount);
+                });
+            })
+        }
     }
 
     return (
@@ -348,6 +372,22 @@ export default function WalletComponent() {
                                 bg='#919fc6'
                                 color='white'
                                 size='lg'
+                                width={'50px'}
+                                height={'40px'}
+                                value={cetusAction}
+                                onChange={(e) => handleCetusAction(e)}>
+                                    <option value="Buy">
+                                        Buy
+                                    </option>
+                                    <option value="Sell">
+                                        Sell
+                                    </option>
+                            </Select>
+                            <Select
+                                borderRadius={'2px'}
+                                bg='#919fc6'
+                                color='white'
+                                size='lg'
                                 width={'150px'}
                                 height={'40px'}
                                 value={cetusPoolAddress}
@@ -371,11 +411,17 @@ export default function WalletComponent() {
                             </NumberInput>
 
                             {
-                                cetusPoolAddress !== ""
+                                cetusPoolAddress !== "" && cetusAction === "Buy"
                                 &&
                                 <Text>
-                                    {/* SUI : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.suiCoinBalance} <br /> */}
-                                    ( {cetusCoinBalanceMap?.get(cetusPoolAddress)?.symbol} ) Supply : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.otherCoinBalance}
+                                    Pool Total Supply ( {cetusCoinBalanceMap?.get(cetusPoolAddress)?.symbol} ) : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.otherCoinBalance}
+                                </Text>
+                            }
+                            {
+                                cetusPoolAddress !== "" && cetusAction === "Sell"
+                                &&
+                                <Text>
+                                    Pool Total Supply ( SUI ) : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.suiCoinBalance}
                                 </Text>
                             }
 

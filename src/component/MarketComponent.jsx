@@ -169,6 +169,8 @@ export default function MarketComponent() {
         let puddle_id = puddle?.id?.id;
         let product_id = item?.id;
         let coin_decimals = puddle?.coin_decimals;
+        console.log("price = "+price);
+        console.log("coin_decimals = "+coin_decimals);
         buyPuddleShares(wallet, kioskId, coin_type, puddle_id, product_id, price, coin_decimals);
     }
 
@@ -405,7 +407,7 @@ export default function MarketComponent() {
                                                                                         buyShares(
                                                                                             item,
                                                                                             puddle,
-                                                                                            Number(itemPriceTable?.get(item.kioskId)) / (10 ** 9),
+                                                                                            Number(itemPriceTable?.get(item.id)) / (10 ** 9),
                                                                                             item.kioskId);
                                                                                     }}
                                                                                 >Buy Shares</Button>

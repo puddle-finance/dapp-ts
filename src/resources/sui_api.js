@@ -1,15 +1,13 @@
-const Puddle_Package_ID = "0x50e58b8187b975fd83e4d07a9b02180d71a76da944c52271673cf38d56be5f4c";
+const Puddle_Package_ID = "0x13da52d49c5e50674f2d77035837e3968def92ed52bdc4360b12f0d11380e492";
 const Puddle_Module = "puddle";
 const Market_Module = "market";
-const Puddle_Gas_Budget = "100000000";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
-const AdminTeamFunds = "0x676fda864186397661646e5cb0a0da3c29f6eaafac13fb73335975e9c0b53aa0";
-const PuddleStatistic = "0x6f93f2a618be0c231da8bd301739766f3638fa445d94e2582ee03142688fbfc9";
-const MarketState = "0x42928db834702b90a9dda7486e908175b416c4238942650aa6ecb1ffa6f183bb";
-const MarketKioskCapType = "0x0000000000000000000000000000000000000000000000000000000000000002::kiosk::KioskOwnerCap";
+const AdminTeamFunds = "0x3da7c0410a7b6e598b38c186973f0c5224ae1d9d142a02c95cd93cb6a12a5783";
+const PuddleStatistic = "0x21368b0cbd0291d9b1f1503967d0e05203aec4cbe7d78894d48dfc179f0c8182";
+const MarketState = "0xd9beb0da5579cce931d176bccb72b55313d4d4d1637246dd9a3dda3eaabe6599";
 
-const TransferPolicy = "0x2df81228f02daaa8be7daba3d1d181df39306274cb308f8863f84fd2cb0753f9";
+const TransferPolicy = "0x1a9d33bb85f98482e1427a3988c1beb3c994a7355a731b69d7cbd25e5dc5a108";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
@@ -588,43 +586,63 @@ export async function buyPuddleShares(wallet, kioskId, coin_type, puddle_id, pro
     type_args.push(coin_type);
 
     if (wallet.connected) {
+
+        let splitCoinTxObj = new TransactionBlock();
         let amount_coin = Number(price) * Number(coin_decimals);
-        let [coins] = txObj.splitCoins(txObj.gas, [txObj.pure(amount_coin)]);
+        let gasFee = 0.002 * Number(coin_decimals);
+        let [coins] = splitCoinTxObj.splitCoins(splitCoinTxObj.gas, [splitCoinTxObj.pure(amount_coin+gasFee)]);
+        splitCoinTxObj.transferObjects([coins], splitCoinTxObj.pure(wallet.account.address));
+        splitCoinTxObj.setSender(wallet.account.address);
 
-        let args = [
-            txObj.pure(kioskId),
-            txObj.pure(puddle_id),
-            txObj.pure(MarketState),
-            txObj.pure(TransferPolicy),
-            txObj.pure(product_id),
-            coins,
-            txObj.pure(clockId),
-        ];
-
-        console.log(args);
-
-        txObj.transferObjects([coins], txObj.pure(wallet.account.address));
-        txObj.setSender(wallet.account.address);
-
-        // call sui move smart contract
-        txObj.moveCall({
-            target: `${Puddle_Package_ID}::${Market_Module}::buy_share`,
-            typeArguments: type_args,
-            arguments: args,
-        })
+        let isSplitCoin = false;
 
         try {
             // signature and Execute Transaction
             const resData = await wallet.signAndExecuteTransactionBlock({
-                transactionBlock: txObj,
+                transactionBlock: splitCoinTxObj,
                 options: { showEffects: true },
             });
             console.log('successfully!', resData);
 
-            window.location.reload();
+            isSplitCoin = true;
 
         } catch (e) {
             console.error('failed', e);
+        }
+
+        console.log('isSplitCoin = '+ isSplitCoin);
+
+        if (isSplitCoin){
+
+            setTimeout(async () => {
+                let coinArr = await provider.getCoins({
+                    owner: wallet.account.address,
+                    coinType: coin_type,
+                });
+                let coinId = null;
+                for (let coin of coinArr.data){
+                    if (coin.balance == (amount_coin+gasFee)){
+                        coinId = coin.coinObjectId;
+                        break;
+                    }
+                }
+                console.log('coinId = '+ coinId);
+                if (coinId != null){
+                    let args = [
+                        txObj.pure(kioskId),
+                        txObj.pure(puddle_id),
+                        txObj.pure(MarketState),
+                        txObj.pure(TransferPolicy),
+                        txObj.pure(product_id),
+                        txObj.pure(coinId),
+                        txObj.pure(clockId)
+                    ];
+    
+                    console.log(args);
+    
+                    handleSignTransaction(wallet, Market_Module, "buy_share", txObj, type_args, args, true);
+                }
+            },2000)
         }
     }
 }

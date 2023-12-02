@@ -343,6 +343,7 @@ export default function WalletComponent() {
                             size='md'
                             width={'150px'}
                             height={'40px'}
+                            icon={{height: "0px", width: "0px"}}
                             value={selectedPuddleId}
                             onChange={(e) => handleSelectAction(e)}
                             margin={'35px'}
@@ -374,6 +375,7 @@ export default function WalletComponent() {
                                 size='lg'
                                 width={'50px'}
                                 height={'40px'}
+                                icon={{height: "0px", width: "0px"}}
                                 value={cetusAction}
                                 onChange={(e) => handleCetusAction(e)}>
                                     <option value="Buy">
@@ -391,6 +393,7 @@ export default function WalletComponent() {
                                 width={'150px'}
                                 height={'40px'}
                                 value={cetusPoolAddress}
+                                icon={{height: "0px", width: "0px"}}
                                 onChange={(e) => handleSelectCoinTypeAction(e)}
                                 placeholder="Select Cion Type...">
                                 {cetusCoinTypeSelect?.map(obj => {

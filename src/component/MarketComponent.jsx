@@ -200,7 +200,7 @@ export default function MarketComponent() {
                                                 <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
                                                     <b>Puddle: </b>
                                                 </Text>
-                                                <Select
+                                                <Select 
                                                     borderRadius={'2px'}
                                                     bg='#919fc6'
                                                     color='white'
@@ -208,6 +208,7 @@ export default function MarketComponent() {
                                                     width={'150px'}
                                                     height={'35px'}
                                                     value={selectedPuddleId}
+                                                    icon={{height: "0px", width: "0px"}}
                                                     onChange={(e) => handleSelectAction(e)}
                                                     placeholder="Select Puddle...">
                                                     {yourInvestItem?.map(share => {

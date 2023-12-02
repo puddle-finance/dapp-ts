@@ -352,7 +352,7 @@ export default function MarketComponent() {
 
                                 </Center>
                                 {
-                                    puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.includes(searchKeyword)).map(puddle => {
+                                    puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
                                         return (
                                             puddle.market_info.kiosk_item_array
                                                 .map(item => {

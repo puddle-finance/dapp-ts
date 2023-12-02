@@ -7,7 +7,6 @@ import { SiCoinmarketcap } from "react-icons/si";
 import { FaCircleDollarToSlot } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
 import { PiBankBold } from "react-icons/pi";
-import { IconContext } from "react-icons";
 
 export default function HeaderComponent() {
 
@@ -19,10 +18,9 @@ export default function HeaderComponent() {
 
     const dexLiStyle = {
         opacity: '1',
-        //order: '0',
         display: 'flex',
         alignItems: 'center',
-        marginLeft: '40px'
+        marginLeft: '40px',
     }
 
     const dexStyle = {
@@ -43,6 +41,49 @@ export default function HeaderComponent() {
         marginLeft: '80px' //左邊界
     }
 
+    const logoStyle = {
+        ".frame": { height: "48px", position: "relative", width: "48px" },
+        ".frame .overlap": {
+            height: "12px",
+            left: "36px",
+            position: "absolute",
+            top: "58px",
+            width: "40px"
+        },
+        ".frame .subtract": {
+            height: "7px",
+            left: "9px",
+            position: "absolute",
+            top: "0",
+            width: "23px"
+        },
+        ".frame .img": {
+            height: "12px",
+            left: "0",
+            position: "absolute",
+            top: "0",
+            width: "40px"
+        },
+        ".frame .overlap-group": {
+            backgroundImage: "url(/src/resources/ellipse-3-1.svg)",
+            backgroundSize: "100% 100%",
+            height: "31px",
+            left: "46px",
+            position: "absolute",
+            top: "27px",
+            width: "23px"
+        },
+        ".frame .ellipse": {
+            height: "5px",
+            left: "14px",
+            position: "absolute",
+            top: "18px",
+            width: "4px"
+        }
+    }
+
+
+
     const [selectedKey, setSelectedKey] = useState('puddle');
 
     const menuOnClick = (e) => {
@@ -59,7 +100,7 @@ export default function HeaderComponent() {
         {
             id: "puddle",
             key: "puddle",
-            icon: <PiBankBold style={{color:'BurlyWood', fontSize: '20px'}} />,
+            icon: <PiBankBold style={{ color: 'BurlyWood', fontSize: '20px' }} />,
             style: { menuStyle },
             label: (
                 <Link to="" style={fontSize}>Puddle</Link>
@@ -68,7 +109,7 @@ export default function HeaderComponent() {
         {
             id: "invest",
             key: "invest",
-            icon: <FaCircleDollarToSlot style={{color:'BurlyWood', fontSize: '20px'}} />,
+            icon: <FaCircleDollarToSlot style={{ color: 'BurlyWood', fontSize: '20px' }} />,
             style: { menuStyle },
             label: (
                 <Link to="invest" style={fontSize}>Invest</Link>
@@ -77,7 +118,7 @@ export default function HeaderComponent() {
         {
             id: "market",
             key: "market",
-            icon: <SiCoinmarketcap style={{color:'BurlyWood', fontSize: '20px'}} />,
+            icon: <SiCoinmarketcap style={{ color: 'BurlyWood', fontSize: '20px' }} />,
             style: { menuStyle },
             label: (
                 <Link to="market" style={fontSize}>Market</Link>
@@ -86,7 +127,7 @@ export default function HeaderComponent() {
         {
             id: "trader",
             key: "trader",
-            icon: <FaChartPie style={{color:'BurlyWood', fontSize: '20px'}} />,
+            icon: <FaChartPie style={{ color: 'BurlyWood', fontSize: '20px' }} />,
             style: { menuStyle },
             label: (
                 <Link to="trader" style={fontSize}>Trader</Link>
@@ -99,18 +140,27 @@ export default function HeaderComponent() {
                 <tbody>
                     <tr>
                         <td>
-                            <li style={dexLiStyle}>
+                            <div style={dexLiStyle}>
                                 <h1 style={dexStyle}>
-                                    <b>
-                                        <span style={{ color: "deepskyblue", fontSize: "30px"}}>Puddle</span>
+                                    <div style={logoStyle['.frame .logo']}>
+                                        <div style={logoStyle['.frame .overlap']}>
+                                            <img style={logoStyle['.frame .subtract']} alt="puddle-small" src="/src/resources/subtract-4.svg" />
+                                            <img style={logoStyle['.frame .img']} alt="puddle-big" src="/src/resources/subtract-3.svg" />
+                                        </div>
+                                        <div style={logoStyle['.frame .overlap-group']}>
+                                            <img style={logoStyle['.frame .ellipse']} alt="droplet" src="/src/resources/ellipse-4-1.svg" />
+                                        </div>
+                                        <div>
+                                        <span style={{ color: "deepskyblue", fontSize: "30px", marginLeft: "40px"}}>Puddle</span>
                                         &nbsp;
-                                        <span style={{ color: "gold", fontSize: "30px"}}>Finance</span>
-                                    </b>
+                                        <span style={{ color: "gold", fontSize: "30px" }}>Finance</span>
+                                        </div>
+                                    </div>
                                 </h1>
-                            </li>
+                            </div>
                         </td>
                         <td>
-                            <Menu onClick={menuOnClick} style={{marginLeft:'70px'}} selectedKeys={[selectedKey]} mode="horizontal" theme="" items={menuItems} />
+                            <Menu onClick={menuOnClick} style={{ marginLeft: '70px' }} selectedKeys={[selectedKey]} mode="horizontal" theme="" items={menuItems} />
                         </td>
                         <td>
                             <li style={connectWallet}>

@@ -89,10 +89,8 @@ async function getPuddleById(puddleId, investUserAddress, isGetHolderInfo, isGet
             let kiosk_item_array = new Array();
             for (let [key, value] of kiosk_item_table) {
                 for (let itemId of value) {
-                    await getItemById(key, itemId, investUserAddress).then(item => {
-                        if (item != null){
-                            kiosk_item_array.push(item);
-                        }
+                    await getItemById(key, itemId).then(item => {
+                        kiosk_item_array.push(item);
                     });
                 }
             }
@@ -231,7 +229,7 @@ export async function getYourFundItems(walletAddress) {
         return puddleArr;
     }
 }
-export async function getItemById(kioskId, itemId, walletAddress) {
+export async function getItemById(kioskId, itemId) {
 
     let response = await provider.getObject({
         id: itemId,
@@ -248,22 +246,19 @@ export async function getItemById(kioskId, itemId, walletAddress) {
 
         let obj = response.data.content.fields;
 
-        if (obj.owner != walletAddress) {
+        itemObj = new Object()
 
-            itemObj = new Object()
+        let coin_type = response.data.type?.split("<")[1]?.replace(">", "");
+        let coin_name = coin_type.split("::")[2];
 
-            let coin_type = response.data.type?.split("<")[1]?.replace(">", "");
-            let coin_name = coin_type.split("::")[2];
-
-            itemObj.coin_decimals = SUI_decimals;
-            itemObj.coin_type = coin_type;
-            itemObj.coin_name = coin_name;
-            itemObj.id = obj.id.id;
-            itemObj.owner = obj.owner;
-            itemObj.puddle_id = obj.puddle_id;
-            itemObj.shares = obj.shares / itemObj.coin_decimals;
-            itemObj.kioskId = kioskId;
-        }
+        itemObj.coin_decimals = SUI_decimals;
+        itemObj.coin_type = coin_type;
+        itemObj.coin_name = coin_name;
+        itemObj.id = obj.id.id;
+        itemObj.owner = obj.owner;
+        itemObj.puddle_id = obj.puddle_id;
+        itemObj.shares = obj.shares / itemObj.coin_decimals;
+        itemObj.kioskId = kioskId;
     }
     console.log(itemObj);
     return itemObj;

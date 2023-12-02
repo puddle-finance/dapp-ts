@@ -121,10 +121,10 @@ export default function MarketComponent() {
 
     function getMarketStateKioskData() {
         getMarketStateKiosk()
-        .then(resp => {
-            setItemPriceTable(resp.item_price_table);
-            setUserKioskTable(resp.user_kiosk_table);
-        });
+            .then(resp => {
+                setItemPriceTable(resp.item_price_table);
+                setUserKioskTable(resp.user_kiosk_table);
+            });
     }
 
     function getYourInvsetFunds() {
@@ -368,7 +368,7 @@ export default function MarketComponent() {
                                                                     <Center>
                                                                         <Flex>
                                                                             {/*puddle name */}
-                                                                            <Text fontSize='25px' as='ins' >
+                                                                            <Text fontSize='25px' as='ins' color={item.owner == wallet.address ? 'red' : 'white'} >
                                                                                 {puddle.metadata.name}
                                                                             </Text>
 
@@ -397,16 +397,19 @@ export default function MarketComponent() {
                                                                     </Center>
                                                                     <Center>
                                                                         <Flex >
-                                                                            <Button
-                                                                                className="btn" marginBottom={'10px'}
-                                                                                onClick={(e) => {
-                                                                                    buyShares(
-                                                                                        item,
-                                                                                        puddle,
-                                                                                        Number(itemPriceTable?.get(item.kioskId)) / (10 ** 9),
-                                                                                        item.kioskId);
-                                                                                }}
-                                                                            >Buy Shares</Button>
+                                                                            {
+                                                                                item.owner !== wallet.address &&
+                                                                                <Button
+                                                                                    className="btn" marginBottom={'10px'}
+                                                                                    onClick={(e) => {
+                                                                                        buyShares(
+                                                                                            item,
+                                                                                            puddle,
+                                                                                            Number(itemPriceTable?.get(item.kioskId)) / (10 ** 9),
+                                                                                            item.kioskId);
+                                                                                    }}
+                                                                                >Buy Shares</Button>
+                                                                            }
                                                                         </Flex>
                                                                     </Center>
 

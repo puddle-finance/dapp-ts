@@ -18,6 +18,8 @@ import {
     getYourInvestItems,
     getPuddleStatistics,
     buyPuddleShares,
+    creatMarket,
+    getMarketStateKiosk
 } from "../resources/sui_api.js";
 
 import axios from 'axios';
@@ -90,6 +92,8 @@ export default function MarketComponent() {
     const [selectedPuddleId, setSelectedPuddleId] = useState('');
     const [salePrice, setSalePrice] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [userKioskTable, setUserKioskTable] = useState(new Map());
+    const [itemPriceTable, setItemPriceTable] = useState(new Map());
 
     useEffect(() => {
         if (wallet.connected) {
@@ -103,6 +107,7 @@ export default function MarketComponent() {
                 setApiurl(SUI_MAINNET_API_URL);
                 setSuiexplor(SUI_MAINNET_SUIEXPLOR_URL);
             }
+            getMarketStateKioskData();
             getYourInvsetFunds();
             getFundsData();
         }
@@ -111,6 +116,14 @@ export default function MarketComponent() {
     function getFundsData() {
         getPuddleStatistics(wallet.account.address, true, false, false, 'market').then(resp => {
             setPuddleStatistics(resp);
+        });
+    }
+
+    function getMarketStateKioskData() {
+        getMarketStateKiosk()
+        .then(resp => {
+            setItemPriceTable(resp.item_price_table);
+            setUserKioskTable(resp.user_kiosk_table);
         });
     }
 
@@ -129,6 +142,8 @@ export default function MarketComponent() {
     }
 
     function saleShares(share) {
+        let kioskId = userKioskTable.get(wallet.account.address).kioskId;
+        let kioskCapId = userKioskTable.get(wallet.account.address).kioskCapId;
         let coin_type = share?.puddle?.coin_type;
         let coin_decimals = share?.puddle?.coin_decimals;
         let shares_id = share?.id;
@@ -139,19 +154,22 @@ export default function MarketComponent() {
             alert("Insufficient shares");
         } else {
             let same = (Number(saleAmounts) * Number(coin_decimals)) == Number(shares) ? true : false;
-            let real_amount = same ? Number(shares) : Number(shares) - (Number(saleAmounts) * Number(coin_decimals));
+            let real_amount = same ? Number(shares) : Number(saleAmounts) * Number(coin_decimals);
             let real_price = Number(price) * Number(coin_decimals);
-            salePuddleShares(wallet, coin_type, puddle_id, shares_id, real_amount, same, real_price);
+            salePuddleShares(wallet, kioskId, kioskCapId, coin_type, puddle_id, shares_id, real_amount, real_price);
         }
     }
 
-    function buyShares(item, puddle) {
+    function createMarket() {
+        creatMarket(wallet);
+    }
+
+    function buyShares(item, puddle, price, kioskId) {
         let coin_type = puddle?.coin_type;
         let puddle_id = puddle?.id?.id;
-        let product_id = item?.id?.id;
+        let product_id = item?.id;
         let coin_decimals = puddle?.coin_decimals;
-        let price = item?.price;
-        buyPuddleShares(wallet, coin_type, puddle_id, product_id, price, coin_decimals);
+        buyPuddleShares(wallet, kioskId, coin_type, puddle_id, product_id, price, coin_decimals);
     }
 
     const resetInput = (share) => {
@@ -187,115 +205,127 @@ export default function MarketComponent() {
                                     <h1 style={{ color: 'gold' }}>Sale Shares</h1>
                                 </Center>
                                 <Center>
-                                    <Card
-                                        border={'1px solid BurlyWood'}
-                                        borderRadius={'2px'}
-                                        bg={'black'}
-                                        width={'80%'}
-                                        mb={'20px'}
-                                    >
-                                        <CardBody>
-                                            {/*Sale Form */}
-                                            <Flex alignItems='center'>
-                                                <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
-                                                    <b>Puddle: </b>
-                                                </Text>
-                                                <Select
-                                                    borderRadius={'2px'}
-                                                    bg='#919fc6'
-                                                    color='white'
-                                                    size='lg'
-                                                    width={'150px'}
-                                                    height={'35px'}
-                                                    value={selectedPuddleId}
-                                                    onChange={(e) => handleSelectAction(e)}
-                                                    placeholder="Select Puddle...">
-                                                    {yourInvestItem?.map(share => {
-                                                        return (<option value={share?.puddle?.id.id} key={share?.puddle?.id.id}>{share?.puddle?.metadata.name}</option>);
-                                                    }
-                                                    )}
-                                                </Select>
+                                    {
+                                        userKioskTable.has(wallet.address) ?
+                                            <Card
+                                                border={'1px solid BurlyWood'}
+                                                borderRadius={'2px'}
+                                                bg={'black'}
+                                                width={'80%'}
+                                                mb={'20px'}
+                                            >
+                                                <CardBody>
+                                                    {/*Sale Form */}
+                                                    <Flex alignItems='center'>
+                                                        <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
+                                                            <b>Puddle: </b>
+                                                        </Text>
+                                                        <Select
+                                                            borderRadius={'2px'}
+                                                            bg='#919fc6'
+                                                            color='white'
+                                                            size='lg'
+                                                            width={'150px'}
+                                                            height={'35px'}
+                                                            value={selectedPuddleId}
+                                                            onChange={(e) => handleSelectAction(e)}
+                                                            placeholder="Select Puddle...">
+                                                            {yourInvestItem?.map(share => {
+                                                                return (<option value={share?.puddle?.id.id} key={share?.puddle?.id.id}>{share?.puddle?.metadata.name}</option>);
+                                                            }
+                                                            )}
+                                                        </Select>
 
-                                            </Flex>
-                                            <Flex ml={'20px'}>
-                                                <Text color={'#eeb8c6'}>Total Shares: </Text>
-                                                {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
-                                                    return share?.puddle?.id.id == selectedPuddleId
-                                                })).map(share => {
-                                                    return (<Text fontColor="#eeb8c6" ml={'20px'}>{share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}</Text>)
-                                                }) : (<Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>)
-                                                }
-                                            </Flex >
+                                                    </Flex>
+                                                    <Flex ml={'20px'}>
+                                                        <Text color={'#eeb8c6'}>Total Shares: </Text>
+                                                        {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
+                                                            return share?.puddle?.id.id == selectedPuddleId
+                                                        })).map(share => {
+                                                            return (<Text fontColor="#eeb8c6" ml={'20px'}>{share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}</Text>)
+                                                        }) : (<Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>)
+                                                        }
+                                                    </Flex >
 
-                                            <Flex alignItems='center'>
-                                                <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
-                                                    <b>Amounts: </b>
-                                                </Text>
-                                                <NumberInput maxW='100px' mr='2rem' value={saleAmounts} onChange={(value) => setSaleAmounts(value)} >
-                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
-                                                    <NumberInputStepper height={"40%"} mr={'5px'}>
-                                                        <NumberIncrementStepper />
-                                                        <NumberDecrementStepper />
-                                                    </NumberInputStepper>
-                                                </NumberInput>
-                                            </Flex>
+                                                    <Flex alignItems='center'>
+                                                        <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
+                                                            <b>Amounts: </b>
+                                                        </Text>
+                                                        <NumberInput maxW='100px' mr='2rem' value={saleAmounts} onChange={(value) => setSaleAmounts(value)} >
+                                                            <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                                            <NumberInputStepper height={"40%"} mr={'5px'}>
+                                                                <NumberIncrementStepper />
+                                                                <NumberDecrementStepper />
+                                                            </NumberInputStepper>
+                                                        </NumberInput>
+                                                    </Flex>
 
-                                            <Flex ml={'20px'}>
-                                                <Text color={'#eeb8c6'}>Remain Shares: </Text>
-                                                {yourInvestItem.length > 0 ? yourInvestItem?.filter((share => {
-                                                    return share?.puddle?.id.id == selectedPuddleId
-                                                })).map(share => {
-                                                    if (saleAmounts > share.shares / share.puddle.coin_decimals) {
-                                                        return (
-                                                            <Alert status="warning" fontSize={'15px'}>
-                                                                <AlertIcon color={'yellow'} mr={'5px'} width={'20px'} height={'20px'} />
-                                                                Over Your Share Amounts!!
-                                                            </Alert>)
+                                                    <Flex ml={'20px'}>
+                                                        <Text color={'#eeb8c6'}>Remain Shares: </Text>
+                                                        {yourInvestItem.length > 0 ? yourInvestItem?.filter((share => {
+                                                            return share?.puddle?.id.id == selectedPuddleId
+                                                        })).map(share => {
+                                                            if (saleAmounts > share.shares / share.puddle.coin_decimals) {
+                                                                return (
+                                                                    <Alert status="warning" fontSize={'15px'}>
+                                                                        <AlertIcon color={'yellow'} mr={'5px'} width={'20px'} height={'20px'} />
+                                                                        Over Your Share Amounts!!
+                                                                    </Alert>)
 
-                                                    } else {
-                                                        return (<Text color={'#eeb8c6'} ml={'20px'}>{share.shares / share.puddle.coin_decimals - saleAmounts} {share.puddle.coin_name}</Text>)
-                                                    }
+                                                            } else {
+                                                                return (<Text color={'#eeb8c6'} ml={'20px'}>{share.shares / share.puddle.coin_decimals - saleAmounts} {share.puddle.coin_name}</Text>)
+                                                            }
 
-                                                }) : <Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>}
-                                            </Flex >
-                                            <Flex alignItems='center'>
-                                                <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
-                                                    <b>Price: </b>
-                                                </Text>
-                                                <NumberInput maxW='100px' ml={'30px'} value={salePrice} onChange={(value) => setSalePrice(value)} >
-                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
-                                                    <NumberInputStepper height={"40%"} >
-                                                        <NumberIncrementStepper />
-                                                        <NumberDecrementStepper />
-                                                    </NumberInputStepper>
-                                                </NumberInput>
+                                                        }) : <Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>}
+                                                    </Flex >
+                                                    <Flex alignItems='center'>
+                                                        <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
+                                                            <b>Price: </b>
+                                                        </Text>
+                                                        <NumberInput maxW='100px' ml={'30px'} value={salePrice} onChange={(value) => setSalePrice(value)} >
+                                                            <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                                            <NumberInputStepper height={"40%"} >
+                                                                <NumberIncrementStepper />
+                                                                <NumberDecrementStepper />
+                                                            </NumberInputStepper>
+                                                        </NumberInput>
 
-                                                {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
-                                                    return share?.puddle?.id.id == selectedPuddleId
-                                                })).map(share => {
-                                                    return (<Text fontColor="#eeb8c6" ml={'10px'}> {share.puddle.coin_name}</Text>)
-                                                }) : (<Text color={'#eeb8c6'} ml={'5px'}></Text>)
-                                                }
+                                                        {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
+                                                            return share?.puddle?.id.id == selectedPuddleId
+                                                        })).map(share => {
+                                                            return (<Text fontColor="#eeb8c6" ml={'10px'}> {share.puddle.coin_name}</Text>)
+                                                        }) : (<Text color={'#eeb8c6'} ml={'5px'}></Text>)
+                                                        }
 
-                                            </Flex>
+                                                    </Flex>
 
 
+                                                    <Center mt={'10px'} mb={'10px'}>
+                                                        <Flex>
+                                                            <Button
+                                                                className="btn"
+                                                                onClick={(e) => {
+                                                                    if (yourInvestItem.length > 0) {
+                                                                        let share = yourInvestItem.filter(sh => sh.puddle.id.id == selectedPuddleId)[0];
+                                                                        saleShares(share);
+                                                                    }
+                                                                }}
+                                                            >Confirm to Sale</Button>
+                                                            <Button className="btn" style={{ marginLeft: '10px' }}>Reset</Button>
+                                                        </Flex>
+                                                    </Center>
+                                                </CardBody>
+                                            </Card>
+                                            :
                                             <Center mt={'10px'} mb={'10px'}>
                                                 <Flex>
                                                     <Button
                                                         className="btn"
-                                                        onClick={(e) => {
-                                                            if (yourInvestItem.length > 0) {
-                                                                let share = yourInvestItem.filter(sh => sh.puddle.id.id == selectedPuddleId)[0];
-                                                                saleShares(share);
-                                                            }
-                                                        }}
-                                                    >Confirm to Sale</Button>
-                                                    <Button className="btn" style={{ marginLeft: '10px' }}>Reset</Button>
+                                                        onClick={createMarket}
+                                                    >Create Market</Button>
                                                 </Flex>
                                             </Center>
-                                        </CardBody>
-                                    </Card>
+                                    }
                                 </Center>
                             </Box>
                             {/*右半邊的卡片 */}
@@ -324,63 +354,67 @@ export default function MarketComponent() {
                                 {
                                     puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.includes(searchKeyword)).map(puddle => {
                                         return (
-                                            puddle.market_info.items?.map(item => {
+                                            puddle.market_info.kiosk_item_array
+                                                .map(item => {
+                                                    return (
+                                                        <Center mb={'15px'}>
+                                                            <Card
+                                                                border={'1px solid BurlyWood'}
+                                                                borderRadius={'2px'}
+                                                                bg={'black'}
+                                                                width={'80%'}
+                                                                mb={'20px'} >
+                                                                <CardBody>
+                                                                    <Center>
+                                                                        <Flex>
+                                                                            {/*puddle name */}
+                                                                            <Text fontSize='25px' as='ins' >
+                                                                                {puddle.metadata.name}
+                                                                            </Text>
 
-                                                return (
-                                                    <Center mb={'15px'}>
-                                                        <Card
-                                                            border={'1px solid BurlyWood'}
-                                                            borderRadius={'2px'}
-                                                            bg={'black'}
-                                                            width={'80%'}
-                                                            mb={'20px'} >
-                                                            <CardBody>
-                                                                <Center>
-                                                                    <Flex>
-                                                                        {/*puddle name */}
-                                                                        <Text fontSize='25px' as='ins' >
-                                                                            {puddle.metadata.name}
-                                                                        </Text>
+                                                                            {/*puddle id*/}
+                                                                            <Tooltip
+                                                                                label={`puddle id: ${puddle.id.id}`}
+                                                                                bg={'gray'}
+                                                                            >
+                                                                                <InfoOutlineIcon ml={'3px'} mt={'5px'} />
+                                                                            </Tooltip>
+                                                                        </Flex>
+                                                                    </Center>
+                                                                    <Center>
+                                                                        <Flex mt={'10px'}>
+                                                                            <Text color={'#b8d8e5'} >Amount: </Text>
+                                                                            <Text ml={'20px'}>{item.shares} shares</Text>
 
-                                                                        {/*puddle id*/}
-                                                                        <Tooltip
-                                                                            label={`puddle id: ${puddle.id.id}`}
-                                                                            bg={'gray'}
-                                                                        >
-                                                                            <InfoOutlineIcon ml={'3px'} mt={'5px'} />
-                                                                        </Tooltip>
-                                                                    </Flex>
-                                                                </Center>
-                                                                <Center>
-                                                                    <Flex mt={'10px'}>
-                                                                        <Text color={'#b8d8e5'} >Amount: </Text>
-                                                                        <Text ml={'20px'}>{item.shares} shares</Text>
+                                                                        </Flex>
+                                                                    </Center>
+                                                                    <Center>
+                                                                        <Flex >
+                                                                            <Text color={'#b8d8e5'} >Price: </Text>
+                                                                            <Text ml={'20px'}>{Number(itemPriceTable?.get(item.id)) / (10 ** 9)}</Text>
+                                                                            <Text ml={'10px'}>{item.coin_name} </Text>
+                                                                        </Flex>
+                                                                    </Center>
+                                                                    <Center>
+                                                                        <Flex >
+                                                                            <Button
+                                                                                className="btn" marginBottom={'10px'}
+                                                                                onClick={(e) => {
+                                                                                    buyShares(
+                                                                                        item,
+                                                                                        puddle,
+                                                                                        Number(itemPriceTable?.get(item.kioskId)) / (10 ** 9),
+                                                                                        item.kioskId);
+                                                                                }}
+                                                                            >Buy Shares</Button>
+                                                                        </Flex>
+                                                                    </Center>
 
-                                                                    </Flex>
-                                                                </Center>
-                                                                <Center>
-                                                                    <Flex >
-                                                                        <Text color={'#b8d8e5'} >Price: </Text>
-                                                                        <Text ml={'20px'}>{item.price}</Text>
-                                                                        <Text ml={'10px'}>{item.coin_name} </Text>
-                                                                    </Flex>
-                                                                </Center>
-                                                                <Center>
-                                                                    <Flex >
-                                                                        <Button
-                                                                            className="btn" marginBottom={'10px'}
-                                                                            onClick={(e) => {
-                                                                                buyShares(item, puddle);
-                                                                            }}
-                                                                        >Buy Shares</Button>
-                                                                    </Flex>
-                                                                </Center>
-
-                                                            </CardBody>
-                                                        </Card>
-                                                    </Center>
-                                                );
-                                            })
+                                                                </CardBody>
+                                                            </Card>
+                                                        </Center>
+                                                    );
+                                                })
 
                                         )
                                     }

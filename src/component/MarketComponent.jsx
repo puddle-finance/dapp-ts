@@ -202,7 +202,6 @@ export default function MarketComponent() {
                                                 </Text>
                                                 <Select 
                                                     borderRadius={'2px'}
-                                                    bg='#919fc6'
                                                     color='white'
                                                     size='lg'
                                                     width={'150px'}
@@ -233,7 +232,7 @@ export default function MarketComponent() {
                                                     <b>Amounts: </b>
                                                 </Text>
                                                 <NumberInput maxW='100px' mr='2rem' value={saleAmounts} onChange={(value) => setSaleAmounts(value)} >
-                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                                    <NumberInputField size={'xs'} borderRadius={'2px'} />
                                                     <NumberInputStepper height={"40%"} mr={'5px'}>
                                                         <NumberIncrementStepper />
                                                         <NumberDecrementStepper />
@@ -264,7 +263,7 @@ export default function MarketComponent() {
                                                     <b>Price: </b>
                                                 </Text>
                                                 <NumberInput maxW='100px' ml={'30px'} value={salePrice} onChange={(value) => setSalePrice(value)} >
-                                                    <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} />
+                                                    <NumberInputField size={'xs'} borderRadius={'2px'} />
                                                     <NumberInputStepper height={"40%"} >
                                                         <NumberIncrementStepper />
                                                         <NumberDecrementStepper />

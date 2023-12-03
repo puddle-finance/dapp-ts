@@ -337,62 +337,64 @@ export default function WalletComponent() {
                             <div style={{ overflow: 'overlay' }}>
                               <h1 style={{ color: 'gold' }}>Modify Puddle</h1>
                               <Table style={FundTableStyle}>
-                                <Tr>
-                                  <Td>
-                                    <span>Puddle Name : </span>
-                                  </Td>
-                                  <Td style={{ padding: '2%' }}>
-                                    <span><input style={{ width: '100%' }} type="text" onChange={inputName} value={name} /></span>
-                                  </Td>
-                                </Tr>
-                                <Tr>
-                                  <Td>
-                                    <span>Puddle Description : </span>
-                                  </Td>
-                                  <Td style={{ padding: '2%' }}>
-                                    <span><textarea style={{ width: '100%', height: '80px' }} onChange={inputDesc} value={desc} /></span>
-                                  </Td>
-                                </Tr>
-                                <Tr>
-                                  <Td>
-                                    <span>Coin Type : </span>
-                                  </Td>
-                                  <Td style={{ padding: '2%' }}>
-                                    <select className="styled-select" style={{ width: '100%' }} onChange={inputCoinType} disabled defaultValue={coinType}>
-                                      <option value="0x2::sui::SUI" >SUI</option>
-                                      <option value="0x2::sui::USDT" >USDT</option>
-                                    </select>
-                                  </Td>
-                                </Tr>
-                                <Tr>
-                                  <Td>
-                                    <span>Max Supply : </span>
-                                  </Td>
-                                  <Td style={{ padding: '2%' }}>
-                                    <span><input style={{ width: '100%' }} type="number" onChange={inputMaxSupply} value={maxSupply} disabled /></span>
-                                  </Td>
-                                </Tr>
-                                <Tr>
-                                  <Td>
-                                    <span>Commission Percentage : </span>
-                                  </Td>
-                                  <Td style={{ padding: '2%' }}>
-                                    <span><input style={{ width: '100%' }} type="number" onChange={inputCommissionPercentage} value={commissionPercentage} /></span>
-                                  </Td>
-                                </Tr>
-                                <Tr>
-                                  <Td>
-                                    <span>Trader : </span>
-                                  </Td>
-                                  <Td style={{ padding: '2%' }}>
-                                    <span><input style={{ width: '100%' }} type="text" onChange={inputTrader} value={trader} /></span>
-                                  </Td>
-                                </Tr>
+                                <tbody>
+                                  <Tr>
+                                    <Td>
+                                      <span>Puddle Name : </span>
+                                    </Td>
+                                    <Td style={{ padding: '2%' }}>
+                                      <span><input style={{ width: '100%' }} type="text" onChange={inputName} value={name} /></span>
+                                    </Td>
+                                  </Tr>
+                                  <Tr>
+                                    <Td>
+                                      <span>Puddle Description : </span>
+                                    </Td>
+                                    <Td style={{ padding: '2%' }}>
+                                      <span><textarea style={{ width: '100%', height: '80px' }} onChange={inputDesc} value={desc} /></span>
+                                    </Td>
+                                  </Tr>
+                                  <Tr>
+                                    <Td>
+                                      <span>Coin Type : </span>
+                                    </Td>
+                                    <Td style={{ padding: '2%' }}>
+                                      <select className="styled-select" style={{ width: '100%' }} onChange={inputCoinType} disabled defaultValue={coinType}>
+                                        <option value="0x2::sui::SUI" >SUI</option>
+                                        <option value="0x2::sui::USDT" >USDT</option>
+                                      </select>
+                                    </Td>
+                                  </Tr>
+                                  <Tr>
+                                    <Td>
+                                      <span>Max Supply : </span>
+                                    </Td>
+                                    <Td style={{ padding: '2%' }}>
+                                      <span><input style={{ width: '100%' }} type="number" onChange={inputMaxSupply} value={maxSupply} disabled /></span>
+                                    </Td>
+                                  </Tr>
+                                  <Tr>
+                                    <Td>
+                                      <span>Commission Percentage : </span>
+                                    </Td>
+                                    <Td style={{ padding: '2%' }}>
+                                      <span><input style={{ width: '100%' }} type="number" onChange={inputCommissionPercentage} value={commissionPercentage} /></span>
+                                    </Td>
+                                  </Tr>
+                                  <Tr>
+                                    <Td>
+                                      <span>Trader : </span>
+                                    </Td>
+                                    <Td style={{ padding: '2%' }}>
+                                      <span><input style={{ width: '100%' }} type="text" onChange={inputTrader} value={trader} /></span>
+                                    </Td>
+                                  </Tr>
+                                </tbody>
                               </Table>
 
                               <div>
                                 <button className="btn" onClick={() => modify()}>Modify</button>
-                                <button className="btn" onClick={close}>Close</button>
+                                <button className="btn" onClick={close} style={{ marginLeft: '10px' }}>Close</button>
                               </div>
                             </div>
                           </div>

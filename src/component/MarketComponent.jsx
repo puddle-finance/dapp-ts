@@ -56,15 +56,16 @@ export default function MarketComponent() {
     }
 
     const ThStyle = {
-        fontSize: '24px',
-        color: 'deepskyblue',
+        fontWeight: '500',
+        fontSize: '18px',
+        color: 'Grey'
     }
 
     const TableStyle = {
-        backgroundColor: '#111524',
-        border: '1px solid darkgoldenrod',
+        backgroundColor: 'rgba(17,21,36,0.95)',
+        //border: '1px solid darkgoldenrod',
         padding: '20px',
-        borderRadius: '18px',
+        borderRadius: '4px',
         width: '45vw',
         margin: '15px',
         display: 'inline-table',
@@ -184,11 +185,11 @@ export default function MarketComponent() {
                                 style={TableStyle}
                             >
                                 <Center>
-                                    <h1 style={{ color: 'gold' }}>Sale Shares</h1>
+                                    <h2 style={{ color: 'deepSkyBlue' }}>Sale Shares</h2>
                                 </Center>
                                 <Center>
                                     <Card
-                                        border={'1px solid BurlyWood'}
+                                        border={'1px solid white'}
                                         borderRadius={'2px'}
                                         bg={'black'}
                                         width={'80%'}
@@ -202,7 +203,6 @@ export default function MarketComponent() {
                                                 </Text>
                                                 <Select 
                                                     borderRadius={'2px'}
-                                                    color='white'
                                                     size='lg'
                                                     width={'150px'}
                                                     height={'35px'}
@@ -218,12 +218,12 @@ export default function MarketComponent() {
 
                                             </Flex>
                                             <Flex ml={'20px'}>
-                                                <Text color={'#eeb8c6'}>Total Shares: </Text>
+                                                <Text color={'#b8d8e5'}>Total Shares: </Text>
                                                 {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
                                                     return share?.puddle?.id.id == selectedPuddleId
                                                 })).map(share => {
-                                                    return (<Text fontColor="#eeb8c6" ml={'20px'}>{share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}</Text>)
-                                                }) : (<Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>)
+                                                    return (<Text color='gold' ml={'20px'}>{share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}</Text>)
+                                                }) : (<Text></Text>)
                                                 }
                                             </Flex >
 
@@ -241,22 +241,22 @@ export default function MarketComponent() {
                                             </Flex>
 
                                             <Flex ml={'20px'}>
-                                                <Text color={'#eeb8c6'}>Remain Shares: </Text>
+                                                <Text color={'#b8d8e5'}>Remain Shares: </Text>
                                                 {yourInvestItem.length > 0 ? yourInvestItem?.filter((share => {
                                                     return share?.puddle?.id.id == selectedPuddleId
                                                 })).map(share => {
                                                     if (saleAmounts > share.shares / share.puddle.coin_decimals) {
                                                         return (
                                                             <Alert status="warning" fontSize={'15px'}>
-                                                                <AlertIcon color={'yellow'} mr={'5px'} width={'20px'} height={'20px'} />
+                                                                <AlertIcon color={'red'} mr={'5px'} width={'20px'} height={'20px'} />
                                                                 Over Your Share Amounts!!
                                                             </Alert>)
 
                                                     } else {
-                                                        return (<Text color={'#eeb8c6'} ml={'20px'}>{share.shares / share.puddle.coin_decimals - saleAmounts} {share.puddle.coin_name}</Text>)
+                                                        return (<Text color={'gold'} ml={'20px'}>{share.shares / share.puddle.coin_decimals - saleAmounts} {share.puddle.coin_name}</Text>)
                                                     }
 
-                                                }) : <Text color={'#eeb8c6'} ml={'20px'}>N/A</Text>}
+                                                }) : <Text></Text>}
                                             </Flex >
                                             <Flex alignItems='center'>
                                                 <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
@@ -273,8 +273,8 @@ export default function MarketComponent() {
                                                 {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
                                                     return share?.puddle?.id.id == selectedPuddleId
                                                 })).map(share => {
-                                                    return (<Text fontColor="#eeb8c6" ml={'10px'}> {share.puddle.coin_name}</Text>)
-                                                }) : (<Text color={'#eeb8c6'} ml={'5px'}></Text>)
+                                                    return (<Text color="gold" ml={'10px'}> {share.puddle.coin_name}</Text>)
+                                                }) : (<Text color={'gold'} ml={'5px'}></Text>)
                                                 }
 
                                             </Flex>
@@ -303,14 +303,12 @@ export default function MarketComponent() {
                                 style={TableStyle}
                             >
                                 <Center>
-                                    <h1 style={{ color: 'gold' }}>Buy Shares</h1>
+                                    <h2 style={{ color: 'deepSkyBlue' }}>Buy Shares</h2>
                                 </Center>
                                 <Center mt={'10px'} mb={'15px'}>
                                     <Input
                                         placeholder={'Puddle Name..'}
                                         width={'360px'}
-                                        bg={'#dfdcd5'}
-                                        color={'black'}
                                         value={searchKeyword}
                                         onChange={(e) => handleSearchKeyword(e)}
                                     />
@@ -329,7 +327,7 @@ export default function MarketComponent() {
                                                 return (
                                                     <Center mb={'15px'}>
                                                         <Card
-                                                            border={'1px solid BurlyWood'}
+                                                            border={'1px solid white'}
                                                             borderRadius={'2px'}
                                                             bg={'black'}
                                                             width={'80%'}

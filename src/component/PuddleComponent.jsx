@@ -52,28 +52,29 @@ export default function WalletComponent() {
   }
 
   const PuddleTableStyle = {
-    backgroundColor: '#111524',
-    border: '1px solid darkgoldenrod',
+    backgroundColor: 'rgba(17,21,36,0.95)',
+    //border: '1px solid darkgoldenrod',
     padding: '20px',
-    borderRadius: '18px',
+    borderRadius: '4px',
     width: '80vw',
     margin: '15px',
     display: 'inline-table',
   }
 
   const FundTableStyle = {
-    backgroundColor: '#111524',
-    border: '1px solid darkgoldenrod',
+    backgroundColor: 'rgba(17,21,36,0.95)',
+    //border: '1px solid darkgoldenrod',
     padding: '18px',
-    borderRadius: '18px',
+    borderRadius: '4px',
     width: '45vw',
     margin: '15px',
     display: 'inline-table',
   }
 
   const ThStyle = {
-    fontSize: '24px',
-    color: 'deepskyblue',
+    fontWeight: '500',
+    fontSize: '18px',
+    color: 'Grey'
   }
 
   const TdStyle = {
@@ -212,13 +213,13 @@ export default function WalletComponent() {
             <div>
               <div style={{ textAlign: "left" }}>
                 <a style={{ cursor: "pointer" }}>
-                  <Icon as={CloseIcon} className="close" onClick={close} />
+                  <Icon as={CloseIcon} color={'white'} onClick={close} />
                 </a>
               </div>
               <div style={{ overflow: 'overlay' }}>
-                <h1 style={{ color: 'gold' }}>Create Puddle</h1>
+                <h2 style={{ color: 'deepSkyBlue' }}>Create Puddle</h2>
                 <Table style={FundTableStyle}>
-                  <tbody>
+                  <Tbody>
                     <Tr>
                       <Td>
                         <span>Puddle Name : </span>
@@ -270,7 +271,7 @@ export default function WalletComponent() {
                         <span><input style={{ width: '100%' }} type="text" onChange={inputTrader} value={trader} /></span>
                       </Td>
                     </Tr>
-                  </tbody>
+                  </Tbody>
                 </Table>
 
                 <div>
@@ -293,7 +294,7 @@ export default function WalletComponent() {
           )}
         </Popup>
 
-        <h1 style={{ color: 'gold', display: 'inline-block', padding: '10px' }}>Your Puddles</h1>
+        <h2 style={{ color: 'deepSkyBlue', display: 'inline-block', padding: '10px' }}>Your Puddles</h2>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -331,13 +332,13 @@ export default function WalletComponent() {
                           <div>
                             <div style={{ textAlign: "left" }}>
                               <a style={{ cursor: "pointer" }}>
-                                <Icon as={CloseIcon} className="close" onClick={close} />
+                                <Icon as={CloseIcon} color={'white'} onClick={close} />
                               </a>
                             </div>
                             <div style={{ overflow: 'overlay' }}>
-                              <h1 style={{ color: 'gold' }}>Modify Puddle</h1>
+                              <h2 style={{ color: 'deepSkyBlue' }}>Modify Puddle</h2>
                               <Table style={FundTableStyle}>
-                                <tbody>
+                                <Tbody>
                                   <Tr>
                                     <Td>
                                       <span>Puddle Name : </span>
@@ -389,7 +390,7 @@ export default function WalletComponent() {
                                       <span><input style={{ width: '100%' }} type="text" onChange={inputTrader} value={trader} /></span>
                                     </Td>
                                   </Tr>
-                                </tbody>
+                                </Tbody>
                               </Table>
 
                               <div>
@@ -408,7 +409,7 @@ export default function WalletComponent() {
                     </Td>
                     <Td>{puddle?.puddle?.commission_percentage + '%'}</Td>
                     <Td>{puddle?.puddle?.holder_info?.holders_count + ' People'}</Td>
-                    <Td>{isNaN(Number(puddle?.puddle?.balance) / Number(puddle?.puddle?.coin_decimals)) ? ''
+                    <Td style={{ color: 'gold' }}>{isNaN(Number(puddle?.puddle?.balance) / Number(puddle?.puddle?.coin_decimals)) ? ''
                       : (Number(puddle?.puddle?.balance) / Number(puddle?.puddle?.coin_decimals)) + " " + puddle?.puddle?.coin_name}</Td>
                   </Tr>
                 )

@@ -50,28 +50,29 @@ export default function WalletComponent() {
   }
 
   const WalletTableStyle = {
-    backgroundColor: '#111524',
-    border: '1px solid darkgoldenrod',
+    backgroundColor: 'rgba(17,21,36,0.95)',
+    //border: '1px solid darkgoldenrod',
     padding: '20px',
-    borderRadius: '18px',
+    borderRadius: '4px',
     width: '45vw',
     margin: '0px',
     display: 'inline-table',
   }
 
   const FundTableStyle = {
-    backgroundColor: '#111524',
-    border: '1px solid darkgoldenrod',
+    backgroundColor: 'rgba(17,21,36,0.95)',
+    //border: '1px solid darkgoldenrod',
     padding: '20px',
-    borderRadius: '18px',
+    borderRadius: '4px',
     width: '45vw',
     margin: '18px',
     display: 'inline-table',
   }
 
   const ThStyle = {
-    fontSize: '24px',
-    color: 'deepskyblue',
+    fontWeight: '500',
+    fontSize: '18px',
+    color: 'Grey'
   }
 
   const TdStyle = {
@@ -204,7 +205,7 @@ export default function WalletComponent() {
   return (
     <div className="wallet" style={walletStyle}>
       <div style={WalletTableStyle}>
-        <h1 style={{ color: 'gold' }}>Wallet Detail</h1>
+        <h2 style={{ color: 'deepSkyBlue' }}>Wallet Detail</h2>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -223,7 +224,7 @@ export default function WalletComponent() {
                     ? 'Connected'
                     : 'N/A'}
               </Td>
-              <Td>
+              <Td style={{ color: 'gold' }}>
                 {balance ? formatSUI(balance ?? 0, {
                   withAbbr: false
                 }) + ' SUI' : 'N/A'}
@@ -232,7 +233,7 @@ export default function WalletComponent() {
           </Tbody>
         </Table>
 
-        <h1 style={{ color: 'gold' }}>Your Invested Puddles</h1>
+        <h2 style={{ color: 'deepSkyBlue' }}>Your Invested Puddles</h2>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -258,11 +259,11 @@ export default function WalletComponent() {
                           <div>
                             <div style={{ textAlign: "left" }}>
                               <a style={{ cursor: "pointer" }}>
-                                <Icon as={CloseIcon} className="close" onClick={close} />
+                                <Icon as={CloseIcon} color={'white'} onClick={close} />
                               </a>
                             </div>
                             <div style={{ overflow: 'overlay' }}>
-                              <h1 style={{ color: 'gold' }}>Fund Detail</h1>
+                              <h2 style={{ color: 'deepSkyBlue' }}>Fund Detail</h2>
                               <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                 <Thead>
                                   <Tr>
@@ -300,7 +301,7 @@ export default function WalletComponent() {
 
                               <hr />
 
-                              <h1 style={{ color: 'gold' }}>Invested Detail</h1>
+                              <h3 style={{ color: 'deepSkyBlue' }}>Invested Detail</h3>
                               <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                 <Thead>
                                   <Tr>
@@ -361,7 +362,7 @@ export default function WalletComponent() {
                       </Popup>
                     </Td>
                     <Td className="fontverylong">{puddle?.puddle.metadata.desc}</Td>
-                    <Td>{Number(puddle?.shares) / puddle?.puddle.coin_decimals + " " + puddle?.puddle.coin_name}</Td>
+                    <Td style={{ color: 'gold' }}>{Number(puddle?.shares) / puddle?.puddle.coin_decimals + " " + puddle?.puddle.coin_name}</Td>
                   </Tr>
                 )
               })
@@ -371,7 +372,7 @@ export default function WalletComponent() {
       </div>
 
       <div style={FundTableStyle}>
-        <h1 style={{ color: 'gold' }}>Puddles</h1>
+        <h2 style={{ color: 'deepSkyBlue' }}>Puddles</h2>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -399,11 +400,11 @@ export default function WalletComponent() {
                             <div>
                               <div style={{ textAlign: "left" }}>
                                 <a style={{ cursor: "pointer" }}>
-                                  <Icon as={CloseIcon} className="close" onClick={close} />
+                                  <Icon as={CloseIcon} color={'white'} onClick={close} />
                                 </a>
                               </div>
                               <div style={{ overflow: 'overlay' }}>
-                                <h1 style={{ color: 'gold' }}>Fund Detail</h1>
+                                <h2 style={{ color: 'deepSkyBlue' }}>Fund Detail</h2>
                                 <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                   <Thead>
                                     <Tr>
@@ -439,7 +440,7 @@ export default function WalletComponent() {
   
                                 <hr />
   
-                                <h1 style={{ color: 'gold' }}>Invested Detail</h1>
+                                <h2 style={{ color: 'deepSkyBlue' }}>Invested Detail</h2>
                                 <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                   <Thead>
                                     <Tr>
@@ -494,7 +495,7 @@ export default function WalletComponent() {
                         </Popup>
                       </Td>
                       <Td className="fontverylong">{puddle.metadata.desc}</Td>
-                      <Td>{Number(puddle?.metadata?.total_supply) / puddle.coin_decimals + " " + puddle.coin_name}</Td>
+                      <Td style={{ color: 'gold' }}>{Number(puddle?.metadata?.total_supply) / puddle.coin_decimals + " " + puddle.coin_name}</Td>
                     </Tr>
                   )
                 }

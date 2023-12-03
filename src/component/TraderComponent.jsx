@@ -69,7 +69,6 @@ import {
 } from '@chakra-ui/react';
 
 import '../resources/style.css';
-import 'reactjs-popup/dist/index.css';
 import { CoinMetadataStruct, SUI_DECIMALS } from "@mysten/sui.js";
 
 export default function WalletComponent() {
@@ -78,19 +77,19 @@ export default function WalletComponent() {
     }
 
     const DashboardTableStyle = {
-        backgroundColor: '#111524',
-        border: '1px solid darkgoldenrod',
+        backgroundColor: 'rgba(17,21,36,0.95)',
+        //border: '1px solid darkgoldenrod',
         padding: '5px',
-        borderRadius: '18px',
-        width: '80vw',
+        borderRadius: '4px',
+        width: '79.5vw',
         display: 'inline-table',
     }
 
     const puddleSettingTableStyle = {
-        backgroundColor: '#111524',
-        border: '1px solid darkgoldenrod',
+        backgroundColor: 'rgba(17,21,36,0.95)',
+        //border: '1px solid darkgoldenrod',
         padding: '5px',
-        borderRadius: '18px',
+        borderRadius: '4px',
         width: '65vw',
         hight: '5vw',
         margin: '10px',
@@ -366,7 +365,7 @@ export default function WalletComponent() {
 
 
                     <div style={puddleSettingTableStyle}>
-                        <h1 style={{ color: 'gold' }}>Transaction Setting</h1>
+                        <h2 style={{ color: 'deepSkyBlue' }}>Transaction Setting</h2>
                         <Center>
                             <Flex>
                                 <Select
@@ -439,7 +438,7 @@ export default function WalletComponent() {
                                 </Text>
                             }
 
-                            <Text marginLeft={"70px"} color={preSwapAmount === "Number too large" ? 'red' : 'yellow'}>
+                            <Text marginLeft={"70px"} color={preSwapAmount === "Number too large" ? 'red' : 'gold'}>
                                 {preSwapAmount}
                             </Text>
                         </Center>
@@ -447,7 +446,7 @@ export default function WalletComponent() {
                 </Flex>
             </Center>
             <div style={DashboardTableStyle}>
-                <h1 style={{ color: 'gold' }}>Dashboard</h1>
+                <h2 style={{ color: 'deepSkyBlue' }}>Dashboard</h2>
                 {
                     investData.length == 0 &&
                     <Text>No Data</Text>

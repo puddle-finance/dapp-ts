@@ -7,6 +7,8 @@ import { SiCoinmarketcap } from "react-icons/si";
 import { FaCircleDollarToSlot } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
 import { PiBankBold } from "react-icons/pi";
+import { border } from '@chakra-ui/react';
+import { BiBorderRadius } from 'react-icons/bi';
 
 export default function HeaderComponent() {
 
@@ -169,7 +171,6 @@ export default function HeaderComponent() {
                         </td>
                     </tr>
                 </tbody>
-
             </table>
 
             <Outlet />

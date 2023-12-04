@@ -4,7 +4,7 @@ const Market_Module = "market";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
 const AdminTeamFunds = "0x8365007789807a4d396fcf311a4b4ce85b72ec3e010595ea0660d2d0f28717de";
-const PuddleStatistic = "0xe20abce08a16e397ec368979b03bb6323d42605b38c6bd9b6a983c6ebcc45e11";
+const PuddleStatistic = "0x6560d0bf824cfabc3bd9d0f3cc173733e759455878e61a3bf925e863f61cf87a";
 const MarketState = "0x303b89cd8312797ebc0a523ff9b0c47ca89511e04241675346ce1926f9773cee";
 
 const TransferPolicy = "0xa6c7f5cbdc3b6f29b693afbe49bdcd135c0cc447d3a2f60cc2335f7def16bd2f";

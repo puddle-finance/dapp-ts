@@ -1,13 +1,13 @@
-const Puddle_Package_ID = "0xb2c2db22bf1434768ef0224be581ec6a8914467bddfabdf4f8fbfe219e08b3a3";
+const Puddle_Package_ID = "0x73dac4f22cf544ed120ee1cee7860f62736a8f1343402ff6c51ab6d95c4ef1d8";
 const Puddle_Module = "puddle";
 const Market_Module = "market";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
-const AdminTeamFunds = "0x8365007789807a4d396fcf311a4b4ce85b72ec3e010595ea0660d2d0f28717de";
-const PuddleStatistic = "0x6560d0bf824cfabc3bd9d0f3cc173733e759455878e61a3bf925e863f61cf87a";
-const MarketState = "0x303b89cd8312797ebc0a523ff9b0c47ca89511e04241675346ce1926f9773cee";
+const AdminTeamFunds = "0x38e9c14be83729e9f84d9c954f3334a2e1c727e29a15b23c2e69d881f6ba0a01";
+const PuddleStatistic = "0x8b273789ddbe3e854ce53348188a3a6f1a8bb5a8f21028433ed4a84bd4f245be";
+const MarketState = "0x8d5bbf95904e4de17943f64ce870e14b7df5b32f52dd900f1e6fe0e4676149c3";
 
-const TransferPolicy = "0xa6c7f5cbdc3b6f29b693afbe49bdcd135c0cc447d3a2f60cc2335f7def16bd2f";
+const TransferPolicy = "0x4a1d8690740e352249d00841845e8ceb8e22d3379acd72b2e2dfd9e95b395b09";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
@@ -588,9 +588,8 @@ export async function buyPuddleShares(wallet, kioskId, coin_type, puddle_id, pro
     if (wallet.connected) {
 
         let splitCoinTxObj = new TransactionBlock();
-        let amount_coin = Number(price) * Number(coin_decimals);
-        let gasFee = 0.002 * Number(coin_decimals);
-        let [coins] = splitCoinTxObj.splitCoins(splitCoinTxObj.gas, [splitCoinTxObj.pure(amount_coin+gasFee)]);
+        let amount_coin = (Number(price) * Number(coin_decimals)) * 2;
+        let [coins] = splitCoinTxObj.splitCoins(splitCoinTxObj.gas, [splitCoinTxObj.pure(amount_coin)]);
         splitCoinTxObj.transferObjects([coins], splitCoinTxObj.pure(wallet.account.address));
         splitCoinTxObj.setSender(wallet.account.address);
 
@@ -621,12 +620,13 @@ export async function buyPuddleShares(wallet, kioskId, coin_type, puddle_id, pro
                 });
                 let coinId = null;
                 for (let coin of coinArr.data){
-                    if (coin.balance == (amount_coin+gasFee)){
+                    if (coin.balance == (amount_coin)){
                         coinId = coin.coinObjectId;
                         break;
                     }
                 }
                 console.log('coinId = '+ coinId);
+
                 if (coinId != null){
                     let args = [
                         txObj.pure(kioskId),
@@ -642,7 +642,7 @@ export async function buyPuddleShares(wallet, kioskId, coin_type, puddle_id, pro
     
                     handleSignTransaction(wallet, Market_Module, "buy_share", txObj, type_args, args, true);
                 }
-            },2000)
+            },2500)
         }
     }
 }

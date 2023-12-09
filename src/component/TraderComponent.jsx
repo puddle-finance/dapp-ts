@@ -85,6 +85,17 @@ export default function WalletComponent() {
         display: 'inline-table',
     }
 
+    const puddleSelectTableStyle = {
+        backgroundColor: 'rgba(17,21,36,0.95)',
+        //border: '1px solid darkgoldenrod',
+        padding: '5px',
+        borderRadius: '4px',
+        width: '10vw',
+        hight: '5vw',
+        margin: '10px',
+        display: 'inline-table',
+    }
+
     const puddleSettingTableStyle = {
         backgroundColor: 'rgba(17,21,36,0.95)',
         //border: '1px solid darkgoldenrod',
@@ -330,35 +341,37 @@ export default function WalletComponent() {
         <div className="wallet" style={walletStyle}>
             <Center>
                 <Flex>
-                    <Box>
-                        <h2 style={{marginTop: '35px', color: 'deepSkyBlue' }}>Select Puddle</h2>
-                        <Select
-                            borderRadius={'2px'}
-                            color='white'
-                            size='md'
-                            width={'150px'}
-                            height={'40px'}
-                            icon={{ height: "0px", width: "0px" }}
-                            value={selectedPuddleId}
-                            onChange={(e) => handleSelectAction(e)}
-                            margin={'20px'}
-                            placeholder="Select Puddle...">
-                            {yourPuddles?.map(puddle => {
-                                return (
-                                    <option value={puddle?.puddle?.id.id}>
-                                        {puddle?.puddle?.metadata?.name}
-                                    </option>
-                                )
-                            })}
-                        </Select>
-                        {
-                            selectedPuddleId != '' &&
-                            <Text color={'gold'} >
-                                Puddle Balance : {Number(puddleMap.get(selectedPuddleId).puddle.balance) / (10 ** 9)} SUI
-                            </Text>
-                        }
-                    </Box>
+                    <div style={puddleSelectTableStyle}>
+                        <Box>
+                            <h2 style={{ marginTop: '20px', color: 'deepSkyBlue' }}>Select Puddle</h2>
+                            <Select
+                                borderRadius={'2px'}
+                                color='white'
+                                size='md'
+                                width={'150px'}
+                                height={'35px'}
+                                icon={{ height: "0px", width: "0px" }}
+                                value={selectedPuddleId}
+                                onChange={(e) => handleSelectAction(e)}
+                                margin={'20px'}
+                                placeholder="Select Puddle...">
+                                {yourPuddles?.map(puddle => {
+                                    return (
+                                        <option value={puddle?.puddle?.id.id}>
+                                            {puddle?.puddle?.metadata?.name}
+                                        </option>
+                                    )
+                                })}
+                            </Select>
+                            {
+                                selectedPuddleId != '' &&
+                                <Text color={'gold'} mt={5}>
+                                    Puddle Balance : {Number(puddleMap.get(selectedPuddleId).puddle.balance) / (10 ** 9)} SUI
+                                </Text>
+                            }
+                        </Box>
 
+                    </div>
 
                     <div style={puddleSettingTableStyle}>
                         <h2 style={{ color: 'deepSkyBlue' }}>Transaction Setting</h2>
@@ -411,7 +424,7 @@ export default function WalletComponent() {
                                 <Flex>
                                     <Button
                                         className="btn"
-                                        style={{ marginBottom:'10px', marginLeft: '10px' }}
+                                        style={{ marginBottom: '10px', marginLeft: '10px' }}
                                         onClick={submitTransactionSetting}
                                     >Submit</Button>
                                 </Flex>

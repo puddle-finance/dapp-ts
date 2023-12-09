@@ -195,7 +195,7 @@ export default function WalletComponent() {
   }
 
   return (
-    <div className="puddle" style={PuddlStyle}>
+    <div className="puddle" style={PuddlStyle} >
       <div style={PuddleTableStyle}>
         <Popup trigger={<button className="btn">Create</button>}
           onOpen={() => [

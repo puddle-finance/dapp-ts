@@ -55,7 +55,6 @@ export default function WalletComponent() {
 
   const WalletTableStyle = {
     backgroundColor: 'rgba(17,21,36,0.95)',
-    //border: '1px solid darkgoldenrod',
     padding: '20px',
     borderRadius: '4px',
     width: '45vw',
@@ -65,7 +64,6 @@ export default function WalletComponent() {
 
   const FundTableStyle = {
     backgroundColor: 'rgba(17,21,36,0.95)',
-    //border: '1px solid darkgoldenrod',
     padding: '20px',
     borderRadius: '4px',
     width: '45vw',
@@ -396,9 +394,9 @@ export default function WalletComponent() {
           onChange={(e) => handleSearchKeyword(e)}
         />
         <Button
-                                        leftIcon={<BiSearchAlt />}
-                                        className="btn" style={{ marginLeft: '10px' }}
-                                    >Search</Button>
+          leftIcon={<BiSearchAlt />}
+          className="btn" style={{ marginLeft: '10px' }}
+        >Search</Button>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -411,7 +409,7 @@ export default function WalletComponent() {
           <Tbody>
             {
               puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
-              // puddleStatistics?.in_progress_puddles?.map(puddle => {
+                // puddleStatistics?.in_progress_puddles?.map(puddle => {
                 if (!puddle?.isInvest) {
                   return (
                     <Tr>

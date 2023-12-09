@@ -69,7 +69,6 @@ import {
 } from '@chakra-ui/react';
 
 import '../resources/style.css';
-import 'reactjs-popup/dist/index.css';
 import { CoinMetadataStruct, SUI_DECIMALS } from "@mysten/sui.js";
 
 export default function WalletComponent() {
@@ -78,19 +77,19 @@ export default function WalletComponent() {
     }
 
     const DashboardTableStyle = {
-        backgroundColor: '#111524',
-        border: '1px solid darkgoldenrod',
+        backgroundColor: 'rgba(17,21,36,0.95)',
+        //border: '1px solid darkgoldenrod',
         padding: '5px',
-        borderRadius: '18px',
-        width: '80vw',
+        borderRadius: '4px',
+        width: '79.5vw',
         display: 'inline-table',
     }
 
     const puddleSettingTableStyle = {
-        backgroundColor: '#111524',
-        border: '1px solid darkgoldenrod',
+        backgroundColor: 'rgba(17,21,36,0.95)',
+        //border: '1px solid darkgoldenrod',
         padding: '5px',
-        borderRadius: '18px',
+        borderRadius: '4px',
         width: '65vw',
         hight: '5vw',
         margin: '10px',
@@ -220,7 +219,7 @@ export default function WalletComponent() {
                 let title = ["Type", "Amount", "Cost (SUI)", "Pool Total Supply"];
                 investArray.push(title);
                 let investsArray = puddle.puddle.investments.invests;
-                for (let investObj of investsArray){
+                for (let investObj of investsArray) {
                     getPoolDetail(investObj.investsAddress).then(poolDetail => {
                         getCoinMetadata(poolDetail.coinTypeA).then(CoinMetadata => {
                             let investDetailArray = new Array();
@@ -229,8 +228,8 @@ export default function WalletComponent() {
                             let total_supply = Number(poolDetail.coinAmountA) / (10 ** deciamls);
                             let cost_sui = Number(investObj.cost_sui) / (10 ** SUI_DECIMALS);
                             let balance_amount = Number(investObj.balance_amount) / (10 ** deciamls);
-                            console.log("cost_sui = "+cost_sui);
-                            console.log("balance_amount = "+balance_amount);
+                            console.log("cost_sui = " + cost_sui);
+                            console.log("balance_amount = " + balance_amount);
                             investDetailArray.push(symbol, balance_amount, cost_sui, total_supply);
                             investArray.push(investDetailArray);
                         });
@@ -243,10 +242,10 @@ export default function WalletComponent() {
         });
     });
 
-    function changeInvestData(puddleId){
-        if (puddleId === ""){
+    function changeInvestData(puddleId) {
+        if (puddleId === "") {
             setInvestData([]);
-        }else {
+        } else {
             setInvestData(investMap.get(puddleId));
         }
     }
@@ -278,7 +277,7 @@ export default function WalletComponent() {
         getPreSwapAmount(cetusPoolAddress, e.target.value);
     }
 
-    function handleCetusAction(e){
+    function handleCetusAction(e) {
         setCetusAction(e.target.value);
         getPreSwapAmount(cetusPoolAddress, amount);
     }
@@ -299,16 +298,16 @@ export default function WalletComponent() {
         }
     }
 
-    function submitTransactionSetting(){
-        if (cetusAction === "Buy"){
+    function submitTransactionSetting() {
+        if (cetusAction === "Buy") {
             getPoolDetail(cetusPoolAddress).then(poolDetail => {
                 let puddleCapId = puddleMap.get(selectedPuddleId).puddleCapId;
                 let puddleId = puddleMap.get(selectedPuddleId).puddle.id.id;
                 let realAmount = amount * (10 ** 9);
-                console.log("puddleCapId = "+puddleCapId);
-                console.log("puddleId = "+puddleId);
-                console.log("poolDetail = "+JSON.stringify(poolDetail));
-                console.log("realAmount = "+realAmount);
+                console.log("puddleCapId = " + puddleCapId);
+                console.log("puddleId = " + puddleId);
+                console.log("poolDetail = " + JSON.stringify(poolDetail));
+                console.log("realAmount = " + realAmount);
                 cetusInvest(wallet, puddleCapId, puddleId, poolDetail, realAmount);
             })
         } else {
@@ -317,10 +316,10 @@ export default function WalletComponent() {
                     let puddleCapId = puddleMap.get(selectedPuddleId).puddleCapId;
                     let puddleId = puddleMap.get(selectedPuddleId).puddle.id.id;
                     let realAmount = amount * (10 ** CoinMetadata.decimals);
-                    console.log("puddleCapId = "+puddleCapId);
-                    console.log("puddleId = "+puddleId);
-                    console.log("poolDetail = "+JSON.stringify(poolDetail));
-                    console.log("realAmount = "+realAmount);
+                    console.log("puddleCapId = " + puddleCapId);
+                    console.log("puddleId = " + puddleId);
+                    console.log("poolDetail = " + JSON.stringify(poolDetail));
+                    console.log("realAmount = " + realAmount);
                     cetusArbitrage(wallet, puddleCapId, puddleId, poolDetail, realAmount);
                 });
             })
@@ -338,11 +337,12 @@ export default function WalletComponent() {
                         </Text>
                         <Select
                             borderRadius={'2px'}
-                            bg='#919fc6'
+                            // bg='#919fc6'
                             color='white'
                             size='md'
                             width={'150px'}
                             height={'40px'}
+                            icon={{ height: "0px", width: "0px" }}
                             value={selectedPuddleId}
                             onChange={(e) => handleSelectAction(e)}
                             margin={'35px'}
@@ -365,51 +365,64 @@ export default function WalletComponent() {
 
 
                     <div style={puddleSettingTableStyle}>
-                        <h1 style={{ color: 'gold' }}>Transaction Setting</h1>
-                        <VStack>
-                            <Select
-                                borderRadius={'2px'}
-                                bg='#919fc6'
-                                color='white'
-                                size='lg'
-                                width={'50px'}
-                                height={'40px'}
-                                value={cetusAction}
-                                onChange={(e) => handleCetusAction(e)}>
+                        <h2 style={{ color: 'deepSkyBlue' }}>Transaction Setting</h2>
+                        <Center>
+                            <Flex>
+                                <Select
+                                    borderRadius={'2px'}
+                                    // bg='#919fc6'
+                                    color='white'
+                                    size='lg'
+                                    width={'100px'}
+                                    height={'40px'}
+                                    icon={{ height: "0px", width: "0px" }}
+                                    value={cetusAction}
+                                    onChange={(e) => handleCetusAction(e)}>
+                                    {/* placeholder="Select Action..."> */}
                                     <option value="Buy">
                                         Buy
                                     </option>
                                     <option value="Sell">
                                         Sell
                                     </option>
-                            </Select>
-                            <Select
-                                borderRadius={'2px'}
-                                bg='#919fc6'
-                                color='white'
-                                size='lg'
-                                width={'150px'}
-                                height={'40px'}
-                                value={cetusPoolAddress}
-                                onChange={(e) => handleSelectCoinTypeAction(e)}
-                                placeholder="Select Cion Type...">
-                                {cetusCoinTypeSelect?.map(obj => {
-                                    return (
-                                        <option value={obj.cetusPoolAddress}>
-                                            {obj.symbol}
-                                        </option>
-                                    )
-                                })}
+                                </Select>
+                                <Select
+                                    borderRadius={'2px'}
+                                    color='white'
+                                    size='lg'
+                                    width={'200px'}
+                                    height={'40px'}
+                                    value={cetusPoolAddress}
+                                    icon={{ height: "0px", width: "0px" }}
+                                    onChange={(e) => handleSelectCoinTypeAction(e)}
+                                    placeholder="Select Cion Type...">
+                                    {cetusCoinTypeSelect?.map(obj => {
+                                        return (
+                                            <option value={obj.cetusPoolAddress}>
+                                                {obj.symbol}
+                                            </option>
+                                        )
+                                    })}
 
-                            </Select>
-                            <NumberInput width={'400px'} margin={'5px'} >
-                                <NumberInputField bg={'#919fc6'} size={'xs'} borderRadius={'2px'} onInput={handleAmountAction} value={amount} />
-                                <NumberInputStepper height={"40%"} mr={'5px'}>
-                                    <NumberIncrementStepper />
-                                    <NumberDecrementStepper />
-                                </NumberInputStepper>
-                            </NumberInput>
+                                </Select>
+                                <NumberInput width={'350px'} margin={'5px'} >
+                                    <NumberInputField size={'xs'} borderRadius={'2px'} onInput={handleAmountAction} value={amount} />
+                                    <NumberInputStepper height={"40%"} mr={'5px'}>
+                                        <NumberIncrementStepper />
+                                        <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                </NumberInput>
 
+                                <Flex>
+                                    <Button
+                                        className="btn"
+                                        style={{ marginLeft: '10px' }}
+                                        onClick={submitTransactionSetting}
+                                    >Submit</Button>
+                                </Flex>
+                            </Flex>
+                        </Center>
+                        <Center>
                             {
                                 cetusPoolAddress !== "" && cetusAction === "Buy"
                                 &&
@@ -425,27 +438,15 @@ export default function WalletComponent() {
                                 </Text>
                             }
 
-                            <Text color={preSwapAmount === "Number too large" ? 'red' : 'yellow'}>
+                            <Text marginLeft={"70px"} color={preSwapAmount === "Number too large" ? 'red' : 'gold'}>
                                 {preSwapAmount}
                             </Text>
-
-                            <Flex margin={'10px'}>
-                                {/* <Button
-                                    className="btn"
-                                    onClick={resetTransactionSetting}
-                                >Reset</Button> */}
-                                <Button
-                                    className="btn" 
-                                    style={{ marginLeft: '10px' }}
-                                    onClick={submitTransactionSetting}
-                                >Submit</Button>
-                            </Flex>
-                        </VStack>
+                        </Center>
                     </div>
                 </Flex>
             </Center>
             <div style={DashboardTableStyle}>
-                <h1 style={{ color: 'gold' }}>Dashboard</h1>
+                <h2 style={{ color: 'deepSkyBlue' }}>Dashboard</h2>
                 {
                     investData.length == 0 &&
                     <Text>No Data</Text>
@@ -462,9 +463,9 @@ export default function WalletComponent() {
                         </Box>
                         <Box marginBottom={'20px'}>
                             <Chart
-                            chartType="Table"
-                            data={investData}
-                            options={tableChartOptions}
+                                chartType="Table"
+                                data={investData}
+                                options={tableChartOptions}
                             />
                         </Box>
                     </Flex>

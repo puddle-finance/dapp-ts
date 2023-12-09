@@ -35,9 +35,13 @@ import {
   Icon,
   Input,
   position,
+  Tooltip,
+  Button
 } from '@chakra-ui/react';
 
-import { CloseIcon } from '@chakra-ui/icons'
+import { BiSearchAlt } from 'react-icons/bi';
+
+import { CloseIcon, InfoOutlineIcon } from '@chakra-ui/icons'
 
 import Popup from 'reactjs-popup';
 import '../resources/style.css';
@@ -104,7 +108,7 @@ export default function WalletComponent() {
   const wallet = useWallet();
   const { balance } = useAccountBalance();
   const SUI_MAINNET_API_URL = "https://fullnode.mainnet.sui.io";
-  const SUI_TESTNET_API_URL =  "https://fullnode.testnet.sui.io";
+  const SUI_TESTNET_API_URL = "https://fullnode.testnet.sui.io";
   const SUI_DEVNET_API_URL = "https://fullnode.devnet.sui.io";
 
   const SUI_MAINNET_SUIEXPLOR_URL = "https://suiexplorer.com/{type}/{id}?network=mainnet";
@@ -117,6 +121,7 @@ export default function WalletComponent() {
   const [puddleStatistics, setPuddleStatistics] = useState(new Object());
   const [payAmount, setPayAmount] = useState(0);
   const [payPrice, setPayPrice] = useState(0);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   useEffect(() => {
     if (wallet.connected) {
@@ -134,11 +139,11 @@ export default function WalletComponent() {
       getFundsData();
     }
   }, [wallet.connected]);
-  
+
   const getFundsData = useCallback(() => {
     getPuddleStatistics(wallet.account.address, true, false, false, 'invest').then(resp => {
-          setPuddleStatistics(resp);
-        });
+      setPuddleStatistics(resp);
+    });
   });
 
   const getYourInvsetFunds = useCallback(() => {
@@ -155,6 +160,10 @@ export default function WalletComponent() {
     setPayPrice(e.target.value);
   }
 
+  function handleSearchKeyword(e) {
+    setSearchKeyword(e.target.value);
+  }
+
   function mergePuddleSharesFn(puddle) {
     let coin_type = puddle.puddle.coin_type;
     let shares_id = puddle.id;
@@ -163,7 +172,7 @@ export default function WalletComponent() {
   }
 
   function depositAmount(puddle) {
-    if (puddle.puddle){
+    if (puddle.puddle) {
       puddle = puddle.puddle;
     }
     let coin_type = puddle.coin_type;
@@ -239,7 +248,7 @@ export default function WalletComponent() {
             <Tr>
               <Th style={{ ...ThStyle, width: "30%" }} >Name</Th>
               <Th style={{ ...ThStyle, width: "50%" }} >Description</Th>
-              <Th style={{ ...ThStyle, width: "20%" }} >PuddleShares</Th>
+              <Th style={{ ...ThStyle, width: "20%" }} >PuddleShares</Th>Info
             </Tr>
           </Thead>
           <Tbody>
@@ -248,7 +257,14 @@ export default function WalletComponent() {
                 return (
                   <Tr>
                     <Td style={{ ...TdStyle, wordBreak: 'break-all' }}>
-                      <Popup trigger={<a href="javascript:void(0)">{puddle?.puddle?.metadata.name}</a>}
+                      <Popup trigger={
+                        <div>
+                          <a href="javascript:void(0)">{puddle?.puddle?.metadata.name}</a>
+                          <Tooltip label={`puddle id: ${puddle?.puddle?.id.id}`} bg={'gray'} >
+                            <InfoOutlineIcon ml='5px' boxSize={12}></InfoOutlineIcon>
+                          </Tooltip>
+                        </div>
+                      }
                         onOpen={() => [setPayAmount(0), setPayPrice(0)]}
                         onClose={() => [setPayAmount(0), setPayPrice(0)]}
                         modal
@@ -319,7 +335,7 @@ export default function WalletComponent() {
                                 <Tbody>
                                   <Tr>
                                     <Td>
-                                      <b style={{ color: 'cyan' }}>{Number(puddle?.shares) / Number(puddle?.puddle.coin_decimals) + " " + puddle?.puddle.coin_name}</b>
+                                      <div style={{ color: 'gold' }}>{Number(puddle?.shares) / Number(puddle?.puddle.coin_decimals) + " " + puddle?.puddle.coin_name}</div>
                                     </Td>
                                     {
                                       puddle.can_merge
@@ -333,8 +349,8 @@ export default function WalletComponent() {
                                           <input type="number" onChange={changePayAmount} value={payAmount} />
                                         </div>
                                         <div >
-                                          <button className="btn" onClick={() => depositAmount(puddle)} style={{marginTop: '10px'}}>Confirm</button>
-                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px', marginTop: '10px'}}>Cancel</button>
+                                          <button className="btn" onClick={() => depositAmount(puddle)} style={{ marginTop: '10px' }}>Confirm</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{ marginLeft: '10px', marginTop: '10px' }}>Cancel</button>
                                         </div>
                                       </div>
 
@@ -349,8 +365,8 @@ export default function WalletComponent() {
                                             <input type="number" onChange={changePayPrice} value={payPrice} />
                                           </span>
                                         </p>
-                                        <button className="btn" onClick={() => saleAmount(puddle)} style={{marginTop: '10px'}}>Confirm</button>
-                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px',marginTop: '10px'}}>Cancel</button>
+                                        <button className="btn" onClick={() => saleAmount(puddle)} style={{ marginTop: '10px' }}>Confirm</button>
+                                        <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{ marginLeft: '10px', marginTop: '10px' }}>Cancel</button>
                                       </div>
                                     </Td>
                                   </Tr>
@@ -373,6 +389,16 @@ export default function WalletComponent() {
 
       <div style={FundTableStyle}>
         <h2 style={{ color: 'deepSkyBlue' }}>Puddles</h2>
+        <Input mb={10}
+          placeholder={'Puddle Name..'}
+          width={'360px'}
+          value={searchKeyword}
+          onChange={(e) => handleSearchKeyword(e)}
+        />
+        <Button
+                                        leftIcon={<BiSearchAlt />}
+                                        className="btn" style={{ marginLeft: '10px' }}
+                                    >Search</Button>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
           <Thead>
             <Tr>
@@ -384,12 +410,20 @@ export default function WalletComponent() {
           </Thead>
           <Tbody>
             {
-              puddleStatistics?.in_progress_puddles?.map(puddle => {
+              puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
+              // puddleStatistics?.in_progress_puddles?.map(puddle => {
                 if (!puddle?.isInvest) {
                   return (
                     <Tr>
                       <Td style={{ ...TdStyle, wordBreak: 'break-all' }}>
-                        <Popup trigger={<a href="javascript:void(0)">{puddle?.metadata.name}</a>}
+                        <Popup trigger={
+                          <div>
+                            <a href="javascript:void(0)">{puddle?.metadata.name}</a>
+                            <Tooltip label={`puddle id: ${puddle?.id.id}`} bg={'gray'} >
+                              <InfoOutlineIcon ml='5px' boxSize={12}></InfoOutlineIcon>
+                            </Tooltip>
+                          </div>
+                        }
                           onOpen={() => [setPayAmount(0)]}
                           onClose={() => [setPayAmount(0)]}
                           modal
@@ -437,9 +471,9 @@ export default function WalletComponent() {
                                     </Tr>
                                   </Tbody>
                                 </Table>
-  
+
                                 <hr />
-  
+
                                 <h2 style={{ color: 'deepSkyBlue' }}>Invested Detail</h2>
                                 <Table variant='simple' align="center" style={{ width: "100%", color: "white" }}>
                                   <Thead>
@@ -467,10 +501,10 @@ export default function WalletComponent() {
                                             <p style={ThStyle}>Amount</p>
                                             <input type="number" onChange={changePayAmount} value={payAmount} />
                                           </div>
-                                          <button className="btn" onClick={() => depositAmount(puddle)} style={{marginTop: '10px'}}>Confirm</button>
-                                          <button className="btn"  onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px', marginTop: '10px'}}>Cancel</button>
+                                          <button className="btn" onClick={() => depositAmount(puddle)} style={{ marginTop: '10px' }}>Confirm</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{ marginLeft: '10px', marginTop: '10px' }}>Cancel</button>
                                         </div>
-  
+
                                         <div id={puddle.id.id + "_saleAmount"} style={{ display: 'none' }}>
                                           <p>
                                             <span>
@@ -483,7 +517,7 @@ export default function WalletComponent() {
                                             </span>
                                           </p>
                                           <button className="btn" onClick={() => saleAmount(puddle)}>Confirm</button>
-                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{marginLeft:'10px'}}>Cancel</button>
+                                          <button className="btn" onClick={() => [setPayAmount(0), setPayPrice(0)]} style={{ marginLeft: '10px' }}>Cancel</button>
                                         </div>
                                       </Td>
                                     </Tr>

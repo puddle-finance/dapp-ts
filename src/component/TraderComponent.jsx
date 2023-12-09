@@ -331,13 +331,9 @@ export default function WalletComponent() {
             <Center>
                 <Flex>
                     <Box>
-                        <Text
-                            style={{ ...ThStyle }}>
-                            Select Puddle
-                        </Text>
+                        <h2 style={{marginTop: '35px', color: 'deepSkyBlue' }}>Select Puddle</h2>
                         <Select
                             borderRadius={'2px'}
-                            // bg='#919fc6'
                             color='white'
                             size='md'
                             width={'150px'}
@@ -345,7 +341,7 @@ export default function WalletComponent() {
                             icon={{ height: "0px", width: "0px" }}
                             value={selectedPuddleId}
                             onChange={(e) => handleSelectAction(e)}
-                            margin={'35px'}
+                            margin={'20px'}
                             placeholder="Select Puddle...">
                             {yourPuddles?.map(puddle => {
                                 return (
@@ -357,7 +353,7 @@ export default function WalletComponent() {
                         </Select>
                         {
                             selectedPuddleId != '' &&
-                            <Text>
+                            <Text color={'gold'} >
                                 Puddle Balance : {Number(puddleMap.get(selectedPuddleId).puddle.balance) / (10 ** 9)} SUI
                             </Text>
                         }
@@ -372,9 +368,8 @@ export default function WalletComponent() {
                                     borderRadius={'2px'}
                                     // bg='#919fc6'
                                     color='white'
-                                    size='lg'
                                     width={'100px'}
-                                    height={'40px'}
+                                    height={'35px'}
                                     icon={{ height: "0px", width: "0px" }}
                                     value={cetusAction}
                                     onChange={(e) => handleCetusAction(e)}>
@@ -391,7 +386,7 @@ export default function WalletComponent() {
                                     color='white'
                                     size='lg'
                                     width={'200px'}
-                                    height={'40px'}
+                                    height={'35px'}
                                     value={cetusPoolAddress}
                                     icon={{ height: "0px", width: "0px" }}
                                     onChange={(e) => handleSelectCoinTypeAction(e)}
@@ -405,8 +400,8 @@ export default function WalletComponent() {
                                     })}
 
                                 </Select>
-                                <NumberInput width={'350px'} margin={'5px'} >
-                                    <NumberInputField size={'xs'} borderRadius={'2px'} onInput={handleAmountAction} value={amount} />
+                                <NumberInput width={'350px'} height={'40px'} borderRadius={'2px'} defaultValue={0} min={0} >
+                                    <NumberInputField borderRadius={'2px'} onInput={handleAmountAction} value={amount} />
                                     <NumberInputStepper height={"40%"} mr={'5px'}>
                                         <NumberIncrementStepper />
                                         <NumberDecrementStepper />
@@ -416,7 +411,7 @@ export default function WalletComponent() {
                                 <Flex>
                                     <Button
                                         className="btn"
-                                        style={{ marginLeft: '10px' }}
+                                        style={{ marginBottom:'10px', marginLeft: '10px' }}
                                         onClick={submitTransactionSetting}
                                     >Submit</Button>
                                 </Flex>

@@ -37,9 +37,10 @@ import {
   Icon,
   Input,
   position,
+  Tooltip
 } from '@chakra-ui/react';
 
-import { CloseIcon } from '@chakra-ui/icons'
+import { CloseIcon, InfoOutlineIcon } from '@chakra-ui/icons'
 
 import Popup from 'reactjs-popup';
 import '../resources/style.css';
@@ -314,7 +315,14 @@ export default function WalletComponent() {
                 return (
                   <Tr>
                     <Td style={{ ...TdStyle, wordBreak: 'break-all' }}>
-                      <Popup trigger={<a href="javascript:void(0)">{puddle?.puddle?.metadata?.name}</a>}
+                      <Popup trigger={
+                        <div>
+                          <a href="javascript:void(0)">{puddle?.puddle?.metadata?.name}</a>
+                          <Tooltip label={`puddle id: ${puddle?.puddle?.id.id}`} bg={'gray'} >
+                            <InfoOutlineIcon ml='5px' boxSize={12}></InfoOutlineIcon>
+                          </Tooltip>
+                        </div>
+                      }
                         onOpen={() => [
                           setMaxSupply(Number(puddle?.puddle?.metadata?.max_supply) / Number(puddle?.puddle?.coin_decimals)),
                           setTrader(puddle?.puddle?.metadata?.trader),

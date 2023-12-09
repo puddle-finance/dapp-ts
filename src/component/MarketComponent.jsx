@@ -328,28 +328,29 @@ export default function MarketComponent() {
             </div>
             <div style={FundTableStyle}>
                 <h2 style={{ color: 'deepSkyBlue' }}>Buy Shares</h2>
-                    <Input mb={12}
-                        placeholder={'Puddle Name..'}
-                        width={'360px'}
-                        value={searchKeyword}
-                        onChange={(e) => handleSearchKeyword(e)}
-                    />
-                    <Button mb={5}
-                        leftIcon={<BiSearchAlt />}
-                        className="btn" style={{ marginLeft: '10px'}}
-                    >Search</Button>
+                <Input mb={15}
+                    placeholder={'Puddle Name..'}
+                    width={'360px'}
+                    value={searchKeyword}
+                    onChange={(e) => handleSearchKeyword(e)}
+                />
+                <Button mb={3}
+                    leftIcon={<BiSearchAlt />}
+                    className="btn" style={{ marginLeft: '10px' }}
+                >Search</Button>
+                {/* <Box > */}
                 {
                     puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
                         return (
                             puddle.market_info.kiosk_item_array.map(item => {
                                 return (
-                                    <Center mb={'15px'}>
+                                    <Center>
                                         <Card
                                             border={'1px solid gray'}
                                             borderRadius={'2px'}
                                             bg={'black'}
                                             width={'80%'}
-                                            mb={'20px'} >
+                                            mb={'15px'} >
                                             <CardBody>
                                                 <Center>
                                                     <Flex>
@@ -362,42 +363,38 @@ export default function MarketComponent() {
                                                             label={`puddle id: ${puddle.id.id}`}
                                                             bg={'gray'}
                                                         >
-                                                            <InfoOutlineIcon ml='5px' mt='25px' boxSize={16}></InfoOutlineIcon>
+                                                            <InfoOutlineIcon ml='5px' mt='23px' boxSize={16}></InfoOutlineIcon>
                                                         </Tooltip>
                                                     </Flex>
                                                 </Center>
                                                 <Center>
                                                     <Flex >
-                                                        <Text mt={'10px'} color={'#b8d8e5'}>Amount: </Text>
-                                                        <Text mt={'10px'} ml={'20px'} color={'gold'}>{item.shares} shares</Text>
-
+                                                        <Text mt={'12px'} color={'#b8d8e5'}>Amount: </Text>
+                                                        <Text mt={'12px'} ml={'20px'} color={'gold'}>{item.shares} shares</Text>
                                                     </Flex>
                                                 </Center>
                                                 <Center>
                                                     <Flex >
-                                                        <Text mt={'5px'} color={'#b8d8e5'} >Price: </Text>
-                                                        <Text mt={'5px'} ml={'20px'} color={'gold'}>{Number(itemPriceTable?.get(item.id)) / (10 ** 9)}</Text>
-                                                        <Text mt={'5px'} ml={'10px'} color={'gold'}>{item.coin_name} </Text>
+                                                        <Text mt={'0px'} color={'#b8d8e5'} >Price: </Text>
+                                                        <Text mt={'0px'} mb={'10px'} ml={'20px'} color={'gold'}>{Number(itemPriceTable?.get(item.id)) / (10 ** 9)}</Text>
+                                                        <Text mt={'0px'} mb={'10px'} ml={'10px'} color={'gold'}>{item.coin_name} </Text>
                                                     </Flex>
                                                 </Center>
                                                 <Center>
-                                                    <Flex >
-                                                        {
-                                                            item.owner !== wallet.address &&
-                                                            <Button
-                                                                className="btn" marginBottom={'10px'}
-                                                                onClick={(e) => {
-                                                                    buyShares(
-                                                                        item,
-                                                                        puddle,
-                                                                        Number(itemPriceTable?.get(item.id)) / (10 ** 9),
-                                                                        item.kioskId);
-                                                                }}
-                                                            >Buy Shares</Button>
-                                                        }
-                                                    </Flex>
+                                                    {
+                                                        item.owner !== wallet.address &&
+                                                        <Button
+                                                            className="btn" marginBottom={'12px'} marginTop={'0px'}
+                                                            onClick={(e) => {
+                                                                buyShares(
+                                                                    item,
+                                                                    puddle,
+                                                                    Number(itemPriceTable?.get(item.id)) / (10 ** 9),
+                                                                    item.kioskId);
+                                                            }}
+                                                        >Buy Shares</Button>
+                                                    }
                                                 </Center>
-
                                             </CardBody>
                                         </Card>
                                     </Center>
@@ -406,8 +403,8 @@ export default function MarketComponent() {
                         )
                     })
                 }
+                {/* </Box> */}
             </div>
         </div>
-
     );
 }

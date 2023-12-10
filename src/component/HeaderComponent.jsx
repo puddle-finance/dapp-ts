@@ -67,7 +67,7 @@ export default function HeaderComponent() {
             width: "40px"
         },
         ".frame .overlap-group": {
-            backgroundImage: "url(../resources/ellipse-3-1.svg)",
+            backgroundImage: "url(/ellipse-3-1.svg)",
             backgroundSize: "100% 100%",
             height: "31px",
             left: "46px",
@@ -146,11 +146,11 @@ export default function HeaderComponent() {
                                 <h1 style={dexStyle}>
                                     <div style={logoStyle['.frame .logo']}>
                                         <div style={logoStyle['.frame .overlap']}>
-                                            <img style={logoStyle['.frame .subtract']} alt="puddle-small" src="../resources/subtract-4.svg" />
-                                            <img style={logoStyle['.frame .img']} alt="puddle-big" src="../resources/subtract-3.svg" />
+                                            <img style={logoStyle['.frame .subtract']} alt="puddle-small" src="/subtract-4.svg" />
+                                            <img style={logoStyle['.frame .img']} alt="puddle-big" src="/subtract-3.svg" />
                                         </div>
                                         <div style={logoStyle['.frame .overlap-group']}>
-                                            <img style={logoStyle['.frame .ellipse']} alt="droplet" src="../resources/ellipse-4-1.svg" />
+                                            <img style={logoStyle['.frame .ellipse']} alt="droplet" src="/ellipse-4-1.svg" />
                                         </div>
                                         <div>
                                         <span style={{ color: "deepskyblue", fontSize: "30px", marginLeft: "40px"}}>Puddle</span>

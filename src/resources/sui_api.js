@@ -1,13 +1,13 @@
-const Puddle_Package_ID = "0x6ff90a4ad47ce3e4bb06b3c7c7d9ff7b575a84155416006ee419a836574b9bd8";
+const Puddle_Package_ID = "0x85b673d53ce1233ffc85658717a5d1eebacb6129cf1a68a4e7ea695e53b95944";
 const Puddle_Module = "puddle";
 const Market_Module = "market";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
-const AdminTeamFunds = "0x1275a40f2bd4710113df6ddf5d6a12685969462cf830badc2dafb2776df3fb31";
-const PuddleStatistic = "0xb9827ee17118b776819520ed5faec04c8288e426e1e304b679775f5c5968321c";
-const MarketState = "0xbbe4bf436b3e9393fabf63d684af60b43129bd9a14f76c6291eea3a40cb56235";
+const AdminTeamFunds = "0x5bfb42aa8283968a8d577688b88c9e30c7155275744f01577cafd5946f097999";
+const PuddleStatistic = "0x598de71011e05816da7ae1abd8816974bf5aada9984664c134b1415740f3935f";
+const MarketState = "0xdfc1d3d1f04385e65e344e216771d769fae4ff3afba7b9578debbe29098ccae7";
 
-const TransferPolicy = "0x20942c09e4c7ca9e9e7e02887d3557b2d95fd72dfdb4283e27eac357230b2d75";
+const TransferPolicy = "0xcd250f6baf2090b543e21439e594b4bcf9b4be7cac1063f99a194f5251e94d81";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;

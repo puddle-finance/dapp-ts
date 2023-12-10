@@ -398,22 +398,21 @@ export default function WalletComponent() {
           className="btn" style={{ marginLeft: '10px' }}
         >Search</Button>
         <Table variant='simple' align="center" style={{ width: "100%" }}>
-          <Thead>
+          <Thead style={{display: 'block'}}>
             <Tr>
-              <Th style={ThStyle} >Name</Th>
-              <Th style={ThStyle} >Description</Th>
-              <Th style={ThStyle} >Total Supply</Th>
-              <Th style={ThStyle} ></Th>
+              <Th style={{...ThStyle, width: '11rem'}} >Name</Th>
+              <Th style={{...ThStyle, width: '12rem'}} >Description</Th>
+              <Th style={{...ThStyle, width: '12rem'}} >Total Supply</Th>
             </Tr>
           </Thead>
-          <Tbody>
+          <Tbody style={{display: 'block', maxHeight: '300px', overflowY: 'auto'}}>
             {
               puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
                 // puddleStatistics?.in_progress_puddles?.map(puddle => {
                 if (!puddle?.isInvest) {
                   return (
                     <Tr>
-                      <Td style={{ ...TdStyle, wordBreak: 'break-all' }}>
+                      <Td style={{ ...TdStyle, wordBreak: 'break-all', width: '12rem' }}>
                         <Popup trigger={
                           <div>
                             <a href="javascript:void(0)">{puddle?.metadata.name}</a>
@@ -526,8 +525,8 @@ export default function WalletComponent() {
                           )}
                         </Popup>
                       </Td>
-                      <Td className="fontverylong">{puddle.metadata.desc}</Td>
-                      <Td style={{ color: 'gold' }}>{Number(puddle?.metadata?.total_supply) / puddle.coin_decimals + " " + puddle.coin_name}</Td>
+                      <Td className="fontverylong" style={{width: '12rem'}}>{puddle.metadata.desc}</Td>
+                      <Td style={{ color: 'gold', width: '12rem' }}>{Number(puddle?.metadata?.total_supply) / puddle.coin_decimals + " " + puddle.coin_name}</Td>
                     </Tr>
                   )
                 }

@@ -219,7 +219,7 @@ export default function WalletComponent() {
               </div>
               <div style={{ overflow: 'overlay' }}>
                 <h2 style={{ color: 'deepSkyBlue' }}>Create Puddle</h2>
-                <Table style={FundTableStyle}>
+                <Table style={FundTableStyle} >
                   <Tbody>
                     <Tr>
                       <Td>

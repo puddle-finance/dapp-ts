@@ -83,6 +83,10 @@ export default function MarketComponent() {
         display: 'inline-table',
     }
 
+    const scrollbarStyle = {
+        maxHeight: '348px',
+        overflowY: 'auto'
+    }
 
     const wallet = useWallet();
     const { balance } = useAccountBalance();
@@ -338,7 +342,7 @@ export default function MarketComponent() {
                     leftIcon={<BiSearchAlt />}
                     className="btn" style={{ marginLeft: '10px' }}
                 >Search</Button>
-                <div>
+                <div style={scrollbarStyle}>
                     {/* <Box > */}
                     {
                         puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {

@@ -745,6 +745,9 @@ export async function getMarketStateKiosk() {
         await getTableKeyValue(obj.item_price_table.fields.id.id).then(rep => {
             marketStateKiosk.item_price_table = rep;
         });
+        await getTableKeyValue(obj.item_share_amount.fields.id.id).then(rep => {
+            marketStateKiosk.item_share_amount = rep;
+        });
         await getTableKeyValue(obj.user_kiosk_table.fields.id.id).then(async rep => {
             let tableMap = new Map();
             for (let [key, value] of rep) {

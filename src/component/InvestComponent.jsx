@@ -246,7 +246,7 @@ export default function WalletComponent() {
             <Tr>
               <Th style={{ ...ThStyle, width: "30%" }} >Name</Th>
               <Th style={{ ...ThStyle, width: "50%" }} >Description</Th>
-              <Th style={{ ...ThStyle, width: "20%" }} >PuddleShares</Th>Info
+              <Th style={{ ...ThStyle, width: "20%" }} >PuddleShares</Th>
             </Tr>
           </Thead>
           <Tbody>

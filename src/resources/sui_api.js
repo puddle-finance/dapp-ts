@@ -1,13 +1,13 @@
-const Puddle_Package_ID = "0x73dac4f22cf544ed120ee1cee7860f62736a8f1343402ff6c51ab6d95c4ef1d8";
+const Puddle_Package_ID = "0x050766977863a7a00161f5bf715e69d490610c3a294a707b8a639712ac22121f";
 const Puddle_Module = "puddle";
 const Market_Module = "market";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
-const AdminTeamFunds = "0x38e9c14be83729e9f84d9c954f3334a2e1c727e29a15b23c2e69d881f6ba0a01";
-const PuddleStatistic = "0x8b273789ddbe3e854ce53348188a3a6f1a8bb5a8f21028433ed4a84bd4f245be";
-const MarketState = "0x8d5bbf95904e4de17943f64ce870e14b7df5b32f52dd900f1e6fe0e4676149c3";
+const AdminTeamFunds = "0x8353b6ea534537172c7db9bf6bbf69a84658dd195b5242114e6d3f8e95b14b5b";
+const PuddleStatistic = "0xf1d38fb687ec5a8e25a144dd79e7138f6c050dd8fdc1766fd86bd6909a6b4b35";
+const MarketState = "0x16f9cb0615f8a327f0e5075cb6664f4fbc3b606ab94970f2b17bd24e1e67fecf";
 
-const TransferPolicy = "0x4a1d8690740e352249d00841845e8ceb8e22d3379acd72b2e2dfd9e95b395b09";
+const TransferPolicy = "0x47d143c1c5085e59e053fc956c8e2f051502c8edce70d36d26d40f8277f133bf";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
@@ -588,7 +588,7 @@ export async function buyPuddleShares(wallet, kioskId, coin_type, puddle_id, pro
     if (wallet.connected) {
 
         let splitCoinTxObj = new TransactionBlock();
-        let amount_coin = (Number(price) * Number(coin_decimals)) * 2;
+        let amount_coin = (Number(price) * Number(coin_decimals));
         let [coins] = splitCoinTxObj.splitCoins(splitCoinTxObj.gas, [splitCoinTxObj.pure(amount_coin)]);
         splitCoinTxObj.transferObjects([coins], splitCoinTxObj.pure(wallet.account.address));
         splitCoinTxObj.setSender(wallet.account.address);
@@ -634,8 +634,8 @@ export async function buyPuddleShares(wallet, kioskId, coin_type, puddle_id, pro
                         txObj.pure(MarketState),
                         txObj.pure(TransferPolicy),
                         txObj.pure(product_id),
-                        txObj.pure(coinId),
-                        txObj.pure(clockId)
+                        txObj.pure(coinId)
+                        // txObj.pure(clockId)
                     ];
     
                     console.log(args);

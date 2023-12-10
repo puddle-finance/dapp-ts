@@ -19,7 +19,8 @@ import {
     getPuddleStatistics,
     buyPuddleShares,
     creatMarket,
-    getMarketStateKiosk
+    getMarketStateKiosk,
+    mergePuddleShares
 } from "../resources/sui_api.js";
 
 import axios from 'axios';
@@ -165,13 +166,19 @@ export default function MarketComponent() {
         let puddle_id = share?.puddle?.id?.id;
         let shares = share?.shares;
         let price = salePrice;
+        let can_merge = share?.can_merge;
+        let merge_id_arr = share?.merge_id_arr;
         if (Number(saleAmounts) > Number(shares) / Number(coin_decimals)) {
             alert("Insufficient shares");
         } else {
-            let same = (Number(saleAmounts) * Number(coin_decimals)) == Number(shares) ? true : false;
-            let real_amount = same ? Number(shares) : Number(saleAmounts) * Number(coin_decimals);
-            let real_price = Number(price) * Number(coin_decimals);
-            salePuddleShares(wallet, kioskId, kioskCapId, coin_type, puddle_id, shares_id, real_amount, real_price);
+            if (can_merge) {
+                alert("Need to merge first");
+            } else {
+                let same = (Number(saleAmounts) * Number(coin_decimals)) == Number(shares) ? true : false;
+                let real_amount = same ? Number(shares) : Number(saleAmounts) * Number(coin_decimals);
+                let real_price = Number(price) * Number(coin_decimals);
+                salePuddleShares(wallet, kioskId, kioskCapId, coin_type, puddle_id, shares_id, real_amount, real_price);
+            }
         }
     }
 
@@ -200,6 +207,13 @@ export default function MarketComponent() {
     function modifyInvestAmount(e) {
 
     }
+
+    function mergePuddleSharesFn(share) {
+        let coin_type = share.puddle.coin_type;
+        let shares_id = share.id;
+        let merge_id_arr = share.merge_id_arr;
+        mergePuddleShares(wallet, coin_type, shares_id, merge_id_arr);
+      }
 
     return (
         <div className="wallet" style={walletStyle}>
@@ -244,7 +258,20 @@ export default function MarketComponent() {
                                         {yourInvestItem.length > 0 ? yourInvestItem.filter((share => {
                                             return share?.puddle?.id.id == selectedPuddleId
                                         })).map(share => {
-                                            return (<Text color='gold' ml={'20px'}>{share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}</Text>)
+                                            return (
+                                                <div>
+                                                    <Text color='gold' ml={'20px'}>
+                                                        {share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}
+                                                        {share?.can_merge &&
+                                                            <Button
+                                                                style={{marginLeft: '1rem'}}
+                                                                className="btn"
+                                                                onClick={() => mergePuddleSharesFn(share)}
+                                                            >Merge Share</Button>
+                                                        }
+                                                    </Text>
+                                                </div>
+                                            )
                                         }) : (<Text></Text>)
                                         }
                                     </Flex >

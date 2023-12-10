@@ -1,13 +1,13 @@
-const Puddle_Package_ID = "0xc7aee8f2a463d1750524851c065cc821bdd95cd0e041673b6c33bf8ba2d6ecab";
+const Puddle_Package_ID = "0x6ff90a4ad47ce3e4bb06b3c7c7d9ff7b575a84155416006ee419a836574b9bd8";
 const Puddle_Module = "puddle";
 const Market_Module = "market";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
-const AdminTeamFunds = "0x61c84b7a1f59a024c9a2656d3e6b89d43c9aefd96c896e450c45144662245845";
-const PuddleStatistic = "0x0843480576a37f35df8298a8506a3e01640744a66868702020afd22db457831a";
-const MarketState = "0xadd6f808c4d4f7a6bbc60dc34267de63d29df2e6c70eb1df6955cf73b773ecc7";
+const AdminTeamFunds = "0x1275a40f2bd4710113df6ddf5d6a12685969462cf830badc2dafb2776df3fb31";
+const PuddleStatistic = "0xb9827ee17118b776819520ed5faec04c8288e426e1e304b679775f5c5968321c";
+const MarketState = "0xbbe4bf436b3e9393fabf63d684af60b43129bd9a14f76c6291eea3a40cb56235";
 
-const TransferPolicy = "0x69d760bbf6b6939ac5c64a754c1be30e28bf647decbd92886e8a219d716fa7ee";
+const TransferPolicy = "0x20942c09e4c7ca9e9e7e02887d3557b2d95fd72dfdb4283e27eac357230b2d75";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
@@ -244,6 +244,9 @@ export async function getItemById(kioskId, itemId) {
 
         let obj = response.data.content.fields;
 
+        console.log("==== getItemById ====");
+        console.log(obj);
+
         itemObj = new Object()
 
         let coin_type = response.data.type?.split("<")[1]?.replace(">", "");
@@ -270,6 +273,8 @@ export async function getYourInvestItems(walletAddress) {
     let puddleMap = new Map();
 
     if (response.data) {
+        console.log("==== getYourInvestItems ====");
+        console.log(response.data);
         for (let i = 0; i < response.data.length; i++) {
             let obj = response.data[i];
             let objContent = obj.data.content.fields;
@@ -375,7 +380,7 @@ export async function mergePuddleShares(wallet, coin_type, shares_id, merge_id_a
     });
 
     let args = [
-        txObj.pure(shares_id),
+        txObj.object(shares_id),
         txObj.makeMoveVec({ objects: objects_arr }),
     ];
 
@@ -664,7 +669,7 @@ export async function salePuddleShares(wallet, kioskId, kioskCapId, coin_type, p
         txObj.pure(BigInt(Number(price))),
     ];
 
-    console.log(JSON.stringify(args));
+    console.log(args);
 
     handleSignTransaction(wallet, Market_Module, "sale_share", txObj, type_args, args, true);
 }

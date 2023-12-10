@@ -338,72 +338,74 @@ export default function MarketComponent() {
                     leftIcon={<BiSearchAlt />}
                     className="btn" style={{ marginLeft: '10px' }}
                 >Search</Button>
-                {/* <Box > */}
-                {
-                    puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
-                        return (
-                            puddle.market_info.kiosk_item_array.map(item => {
-                                return (
-                                    <Center>
-                                        <Card
-                                            border={'1px solid gray'}
-                                            borderRadius={'2px'}
-                                            bg={'black'}
-                                            width={'80%'}
-                                            mb={'15px'} >
-                                            <CardBody>
-                                                <Center>
-                                                    <Flex>
-                                                        {/*puddle name */}
-                                                        <Text mt={'15px'} fontSize='22px' as='b' color={item.owner == wallet.address ? 'red' : 'white'} >
-                                                            {puddle.metadata.name}
-                                                        </Text>
-                                                        {/*puddle id*/}
-                                                        <Tooltip
-                                                            label={`puddle id: ${puddle.id.id}`}
-                                                            bg={'gray'}
-                                                        >
-                                                            <InfoOutlineIcon ml='5px' mt='23px' boxSize={16}></InfoOutlineIcon>
-                                                        </Tooltip>
-                                                    </Flex>
-                                                </Center>
-                                                <Center>
-                                                    <Flex >
-                                                        <Text mt={'12px'} color={'#b8d8e5'}>Amount: </Text>
-                                                        <Text mt={'12px'} ml={'20px'} color={'gold'}>{item.shares} shares</Text>
-                                                    </Flex>
-                                                </Center>
-                                                <Center>
-                                                    <Flex >
-                                                        <Text mt={'0px'} color={'#b8d8e5'} >Price: </Text>
-                                                        <Text mt={'0px'} mb={'10px'} ml={'20px'} color={'gold'}>{Number(itemPriceTable?.get(item.id)) / (10 ** 9)}</Text>
-                                                        <Text mt={'0px'} mb={'10px'} ml={'10px'} color={'gold'}>{item.coin_name} </Text>
-                                                    </Flex>
-                                                </Center>
-                                                <Center>
-                                                    {
-                                                        item.owner !== wallet.address &&
-                                                        <Button
-                                                            className="btn" marginBottom={'12px'} marginTop={'0px'}
-                                                            onClick={(e) => {
-                                                                buyShares(
-                                                                    item,
-                                                                    puddle,
-                                                                    Number(itemPriceTable?.get(item.id)) / (10 ** 9),
-                                                                    item.kioskId);
-                                                            }}
-                                                        >Buy Shares</Button>
-                                                    }
-                                                </Center>
-                                            </CardBody>
-                                        </Card>
-                                    </Center>
-                                );
-                            })
-                        )
-                    })
-                }
-                {/* </Box> */}
+                <div>
+                    {/* <Box > */}
+                    {
+                        puddleStatistics?.in_progress_puddles?.filter(puddle => puddle.metadata.name.toLowerCase().includes(searchKeyword.toLowerCase())).map(puddle => {
+                            return (
+                                puddle.market_info.kiosk_item_array.map(item => {
+                                    return (
+                                        <Center>
+                                            <Card
+                                                border={'1px solid gray'}
+                                                borderRadius={'2px'}
+                                                bg={'black'}
+                                                width={'80%'}
+                                                mb={'15px'} >
+                                                <CardBody>
+                                                    <Center>
+                                                        <Flex>
+                                                            {/*puddle name */}
+                                                            <Text mt={'15px'} fontSize='22px' as='b' color={item.owner == wallet.address ? 'red' : 'white'} >
+                                                                {puddle.metadata.name}
+                                                            </Text>
+                                                            {/*puddle id*/}
+                                                            <Tooltip
+                                                                label={`puddle id: ${puddle.id.id}`}
+                                                                bg={'gray'}
+                                                            >
+                                                                <InfoOutlineIcon ml='5px' mt='23px' boxSize={16}></InfoOutlineIcon>
+                                                            </Tooltip>
+                                                        </Flex>
+                                                    </Center>
+                                                    <Center>
+                                                        <Flex >
+                                                            <Text mt={'12px'} color={'#b8d8e5'}>Amount: </Text>
+                                                            <Text mt={'12px'} ml={'20px'} color={'gold'}>{item.shares} shares</Text>
+                                                        </Flex>
+                                                    </Center>
+                                                    <Center>
+                                                        <Flex >
+                                                            <Text mt={'0px'} color={'#b8d8e5'} >Price: </Text>
+                                                            <Text mt={'0px'} mb={'10px'} ml={'20px'} color={'gold'}>{Number(itemPriceTable?.get(item.id)) / (10 ** 9)}</Text>
+                                                            <Text mt={'0px'} mb={'10px'} ml={'10px'} color={'gold'}>{item.coin_name} </Text>
+                                                        </Flex>
+                                                    </Center>
+                                                    <Center>
+                                                        {
+                                                            item.owner !== wallet.address &&
+                                                            <Button
+                                                                className="btn" marginBottom={'12px'} marginTop={'0px'}
+                                                                onClick={(e) => {
+                                                                    buyShares(
+                                                                        item,
+                                                                        puddle,
+                                                                        Number(itemPriceTable?.get(item.id)) / (10 ** 9),
+                                                                        item.kioskId);
+                                                                }}
+                                                            >Buy Shares</Button>
+                                                        }
+                                                    </Center>
+                                                </CardBody>
+                                            </Card>
+                                        </Center>
+                                    );
+                                })
+                            )
+                        })
+                    }
+                    {/* </Box> */}
+                </div>
             </div>
         </div>
     );

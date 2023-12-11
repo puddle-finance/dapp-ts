@@ -790,3 +790,15 @@ export async function creatMarket(wallet) {
 
     handleSignTransaction(wallet, Market_Module, "create_market", txObj, null, args, true);
 }
+
+export async function withdrawKioskValue(wallet, kiosk_obj, kiosk_cap) {
+
+    let txObj = new TransactionBlock();
+
+    let args = [
+        txObj.pure(kiosk_obj),
+        txObj.pure(kiosk_cap)
+    ];
+
+    handleSignTransaction(wallet, Market_Module, "withdraw_kiosk_value", txObj, null, args, true);
+}

@@ -20,7 +20,8 @@ import {
     buyPuddleShares,
     creatMarket,
     getMarketStateKiosk,
-    mergePuddleShares
+    mergePuddleShares,
+    withdrawKioskValue
 } from "../resources/sui_api.js";
 
 import axios from 'axios';
@@ -213,7 +214,11 @@ export default function MarketComponent() {
         let shares_id = share.id;
         let merge_id_arr = share.merge_id_arr;
         mergePuddleShares(wallet, coin_type, shares_id, merge_id_arr);
-      }
+    }
+
+    function withdrawKioskValue(){
+        
+    }
 
     return (
         <div className="wallet" style={walletStyle}>

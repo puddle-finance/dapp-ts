@@ -301,10 +301,10 @@ export default function WalletComponent() {
                 setPreSwapAmount("PreSwap Amount : " + preSwapAmount);
             }).catch((e) => {
                 console.log("e = " + e);
-                setPreSwapAmount(e.toString());
+                // setPreSwapAmount("CETUS SDK Error ...");
             });
         } else {
-            setPreSwapAmount("PreSwap Amount : " + 0);
+            // setPreSwapAmount("PreSwap Amount : " + 0);
         }
     }
 
@@ -445,7 +445,7 @@ export default function WalletComponent() {
                                 </Text>
                             }
                             {
-                                cetusPoolAddress !== ""
+                                cetusPoolAddress !== "" && preSwapAmount
                                 &&
                                 <Text marginLeft={"70px"} color={preSwapAmount.includes("Error") ? 'red' : 'gold'}>
                                 {preSwapAmount}

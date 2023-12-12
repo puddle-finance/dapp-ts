@@ -1,4 +1,4 @@
-import { CetusClmmSDK } from '@cetusprotocol/cetus-sui-clmm-sdk'
+import { CetusClmmSDK } from "@cetusprotocol/cetus-sui-clmm-sdk"
 import { testnetConnection, JsonRpcProvider, SUI_DECIMALS } from "@mysten/sui.js";
 
 const provider = new JsonRpcProvider(testnetConnection);

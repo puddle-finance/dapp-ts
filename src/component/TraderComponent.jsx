@@ -90,7 +90,7 @@ export default function WalletComponent() {
         //border: '1px solid darkgoldenrod',
         padding: '5px',
         borderRadius: '4px',
-        width: '10vw',
+        width: '20vw',
         hight: '5vw',
         margin: '10px',
         display: 'inline-table',
@@ -294,7 +294,6 @@ export default function WalletComponent() {
     }
 
     function getPreSwapAmount(cetusPoolAddress, amount) {
-        console.log("amount = " + amount);
         if (amount && amount !== '' && amount != 0 && cetusPoolAddress && cetusPoolAddress !== '') {
             let isBuy = cetusAction === "Buy" ? true : false;
             getPreSwap(cetusPoolAddress, isBuy, amount).then(preSwapAmount => {
@@ -302,7 +301,7 @@ export default function WalletComponent() {
                 setPreSwapAmount("PreSwap Amount : " + preSwapAmount);
             }).catch((e) => {
                 console.log("e = " + e);
-                setPreSwapAmount("Number too large")
+                setPreSwapAmount(e.toString());
             });
         } else {
             setPreSwapAmount("PreSwap Amount : " + 0);
@@ -345,10 +344,10 @@ export default function WalletComponent() {
                         <Box>
                             <h2 style={{ marginTop: '20px', color: 'deepSkyBlue' }}>Select Puddle</h2>
                             <Select
+                                style={{marginRight: '2rem'}}
                                 borderRadius={'2px'}
                                 color='white'
                                 size='md'
-                                width={'150px'}
                                 height={'35px'}
                                 icon={{ height: "0px", width: "0px" }}
                                 value={selectedPuddleId}
@@ -445,10 +444,14 @@ export default function WalletComponent() {
                                     Pool Total Supply ( SUI ) : {cetusCoinBalanceMap?.get(cetusPoolAddress)?.suiCoinBalance}
                                 </Text>
                             }
-
-                            <Text marginLeft={"70px"} color={preSwapAmount === "Number too large" ? 'red' : 'gold'}>
+                            {
+                                cetusPoolAddress !== ""
+                                &&
+                                <Text marginLeft={"70px"} color={preSwapAmount.includes("Error") ? 'red' : 'gold'}>
                                 {preSwapAmount}
                             </Text>
+                            }
+
                         </Center>
                     </div>
                 </Flex>
@@ -456,11 +459,11 @@ export default function WalletComponent() {
             <div style={DashboardTableStyle}>
                 <h2 style={{ color: 'deepSkyBlue' }}>Dashboard</h2>
                 {
-                    investData.length == 0 &&
+                    investData.length <= 1 &&
                     <Text>No Data</Text>
                 }
                 {
-                    investData.length > 0 &&
+                    investData.length > 1 &&
                     <Flex>
                         <Box marginBottom={'20px'}>
                             <Chart

@@ -24,7 +24,7 @@ const SDKConfig = {
 
 export const clmmTestnet = {
   fullRpcUrl: 'https://fullnode.testnet.sui.io',
-  // swapCountUrl: 'https://api-sui.devcetus.com/v2/sui/swap/count',
+  swapCountUrl: 'https://api-sui.devcetus.com/v2/sui/swap/count',
   simulationAccount: {
     address: ''
   },
@@ -76,6 +76,7 @@ export async function getCetusCoinTypeSelectArray() {
   const repeatArray = new Array();
 
   if (poolsInfo.code === 200) {
+    console.log(poolsInfo.data.lp_list);
     for (const pool of poolsInfo.data.lp_list) {
       if (pool.is_closed) {
         continue
@@ -117,6 +118,7 @@ export async function getPoolDetail(cetusPoolAddress){
 export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
 
   const poolDetail = await getPoolDetail(cetusPoolAddress);
+  console.log(poolDetail);
 
   let from = isBuy? poolDetail.coinTypeB : poolDetail.coinTypeA;
   let to = isBuy? poolDetail.coinTypeA : poolDetail.coinTypeB;
@@ -143,6 +145,8 @@ export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
   }
 
   let input_amount = Number(amount) * Number(10 ** input_decimals);
+
+  console.log("input_amount = "+input_amount);
 
   const res = await TestnetSDK.RouterV2.getBestRouter(
     from, to, input_amount, byAmountIn, priceSplitPoint, partner, swapWithMultiPoolParams, orderSplit, externalRouter);

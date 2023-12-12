@@ -216,8 +216,10 @@ export default function MarketComponent() {
         mergePuddleShares(wallet, coin_type, shares_id, merge_id_arr);
     }
 
-    function withdrawKioskValue(){
-        
+    function withdrawKioskValueFn(){
+        let kioskId = userKioskTable.get(wallet.account.address).kioskId;
+        let kioskCapId = userKioskTable.get(wallet.account.address).kioskCapId;
+        withdrawKioskValue(wallet, kioskId, kioskCapId);
     }
 
     return (
@@ -345,7 +347,11 @@ export default function MarketComponent() {
                                                     }
                                                 }}
                                             >Confirm to Sale</Button>
-                                            <Button className="btn" style={{ marginLeft: '10px' }}>Reset</Button>
+                                            <Button 
+                                                className="btn" 
+                                                style={{ marginLeft: '10px' }}
+                                                onClick={withdrawKioskValueFn}
+                                            >withdraw</Button>
                                         </Flex>
                                     </Center>
                                 </CardBody>

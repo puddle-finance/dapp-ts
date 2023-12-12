@@ -1,13 +1,13 @@
-const Puddle_Package_ID = "0x85b673d53ce1233ffc85658717a5d1eebacb6129cf1a68a4e7ea695e53b95944";
+const Puddle_Package_ID = "0x0d6d8aa4229bd3a2b1d03bcfef741f1e82c38e8a5cd19cffa6cb2177bf951f30";
 const Puddle_Module = "puddle";
 const Market_Module = "market";
 const PuddleCapType = Puddle_Package_ID + "::puddle::PuddleCap";
 const PuddleSharesType = Puddle_Package_ID + "::puddle::PuddleShare";
-const AdminTeamFunds = "0x5bfb42aa8283968a8d577688b88c9e30c7155275744f01577cafd5946f097999";
-const PuddleStatistic = "0x598de71011e05816da7ae1abd8816974bf5aada9984664c134b1415740f3935f";
-const MarketState = "0xdfc1d3d1f04385e65e344e216771d769fae4ff3afba7b9578debbe29098ccae7";
+const AdminTeamFunds = "0xfc9653104f9dcb347450ce5de270861e7d4297812ebbf476ec6011a7a860fb2e";
+const PuddleStatistic = "0xcb792206903a637a9313823fcbdbff3a62c4547f4aeb51dee28fe605a4d4e140";
+const MarketState = "0x8aa6182e28f180161a80d0fb0299c485738f72771c382a500fae2003b70b5a93";
 
-const TransferPolicy = "0xcd250f6baf2090b543e21439e594b4bcf9b4be7cac1063f99a194f5251e94d81";
+const TransferPolicy = "0x96f33c5a743408be5df708a627edca2c809b983588cb975ff500c14c1a3ca715";
 
 const SUI_decimals = 1000000000;
 const USDT_decimals = 1000000000;
@@ -763,11 +763,24 @@ export async function getMarketStateKiosk() {
                         showOwner: true,
                         showContent: true,
                     }
-                }).then(resp => {
-                    let userDetail = new Object();
-                    userDetail.kioskCapId = resp.data.content.fields.id.id;
-                    userDetail.kioskId = resp.data.content.fields.for;
-                    tableMap.set(key, userDetail);
+                }).then(async resp => {
+                    await provider.getObject({
+                        id: resp.data.content.fields.for,
+                        options: {
+                            showType: true,
+                            showOwner: true,
+                            showContent: true,
+                        }
+                    }).then(resp1 => {
+                        console.log("------- resp1 -------");
+                        console.log(resp1);
+                        let userDetail = new Object();
+                        userDetail.kioskCapId = resp.data.content.fields.id.id;
+                        userDetail.kioskId = resp.data.content.fields.for;
+                        userDetail.profits = resp1.data.content.fields.profits;
+                        userDetail.item_count = resp1.data.content.fields.item_count;
+                        tableMap.set(key, userDetail);
+                    })
                 });
             }
             marketStateKiosk.user_kiosk_table = tableMap;

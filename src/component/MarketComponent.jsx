@@ -53,6 +53,7 @@ import { CloseIcon } from '@chakra-ui/icons'
 import Popup from 'reactjs-popup';
 import '../resources/style.css';
 import 'reactjs-popup/dist/index.css';
+import { SUI_DECIMALS } from "@mysten/sui.js";
 
 export default function MarketComponent() {
     const walletStyle = {
@@ -216,7 +217,7 @@ export default function MarketComponent() {
         mergePuddleShares(wallet, coin_type, shares_id, merge_id_arr);
     }
 
-    function withdrawKioskValueFn(){
+    function withdrawKioskValueFn() {
         let kioskId = userKioskTable.get(wallet.account.address).kioskId;
         let kioskCapId = userKioskTable.get(wallet.account.address).kioskCapId;
         withdrawKioskValue(wallet, kioskId, kioskCapId);
@@ -271,7 +272,7 @@ export default function MarketComponent() {
                                                         {share.shares / share.puddle.coin_decimals} {share.puddle.coin_name}
                                                         {share?.can_merge &&
                                                             <Button
-                                                                style={{marginLeft: '1rem'}}
+                                                                style={{ marginLeft: '1rem' }}
                                                                 className="btn"
                                                                 onClick={() => mergePuddleSharesFn(share)}
                                                             >Merge Share</Button>
@@ -347,14 +348,29 @@ export default function MarketComponent() {
                                                     }
                                                 }}
                                             >Confirm to Sale</Button>
-                                            <Button 
-                                                className="btn" 
-                                                style={{ marginLeft: '10px' }}
-                                                onClick={withdrawKioskValueFn}
-                                            >withdraw</Button>
                                         </Flex>
                                     </Center>
                                 </CardBody>
+                                {
+                                    userKioskTable.get(wallet.address)?.profits > 0 &&
+                                    <CardBody>
+                                        <Flex alignItems='center'>
+                                            <Text fontSize={'20px'} mr={'30px'} ml={'20px'} color={'#b8d8e5'}>
+                                                <b>Sell Profits:</b>
+                                            </Text>
+                                            <label style={{color:'yellow'}}>{userKioskTable.get(wallet.address)?.profits / (10 ** SUI_DECIMALS)} SUI</label>
+                                        </Flex>
+                                        <Center mt={'10px'} mb={'10px'}>
+                                            <Flex>
+                                                <Button
+                                                    className="btn"
+                                                    style={{ marginLeft: '10px' }}
+                                                    onClick={withdrawKioskValueFn}
+                                                >withdraw</Button>
+                                            </Flex>
+                                        </Center>
+                                    </CardBody>
+                                }
                             </Card>
                             :
                             <Center mt={'10px'} mb={'10px'}>

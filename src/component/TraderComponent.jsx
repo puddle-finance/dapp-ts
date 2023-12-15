@@ -35,7 +35,7 @@ import {
     cetusArbitrage
 } from "../resources/sui_api.js";
 
-import { getCetusCoinTypeSelectArray, getPreSwap, getPoolDetail } from "../resources/cetus_api.js";
+import { getCetusCoinTypeSelectArray, getPreSwap, getPoolDetail, sqrtPriceX64ToPrice } from "../resources/cetus_api.js";
 
 // import { createColumnHelper } from "@tanstack/react-table"
 // import DataTableComponent from './DataTableComponent';
@@ -138,7 +138,7 @@ export default function WalletComponent() {
     const tableChartOptions = {
         is3D: true,
         backgroundColor: "transparent",
-        width: "45vw",
+        width: "47vw",
         hight: "50vw",
         pageSize: 8,
         cssClassNames: {
@@ -199,8 +199,10 @@ export default function WalletComponent() {
     const [amount, setAmount] = useState();
     const [preSwapAmount, setPreSwapAmount] = useState();
 
-    const [investMap, setInvestMap] = useState();
-    const [investData, setInvestData] = useState([]);
+    const [investTableMap, setInvestTableMap] = useState();
+    const [investPieMap, setInvestPieMap] = useState();
+    const [investTableData, setInvestTableData] = useState([]);
+    const [investPieData, setInvestPieData] = useState([]);
 
     useEffect(() => {
         if (wallet.connected) {
@@ -222,42 +224,55 @@ export default function WalletComponent() {
     const getYourPuddlesData = useCallback(() => {
         getYourFundItems(wallet.account.address).then(resp => {
             let puddle_map = new Map();
-            let investMap = new Map();
+            let investTableMap = new Map();
+            let investPieMap = new Map();
             for (let puddle of resp) {
-                let investArray = [];
-                investMap.set(puddle.puddle.id.id, investArray);
+                let investTableArray = [];
+                let investPieArray = [];
+                investTableMap.set(puddle.puddle.id.id, investTableArray);
+                investPieMap.set(puddle.puddle.id.id, investPieArray);
                 puddle_map.set(puddle.puddle.id.id, puddle);
-                let title = ["Type", "Amount", "Cost (SUI)", "Pool Total Supply"];
-                investArray.push(title);
+                let title = ["Type", "Current Value", "Exchange Rate", "Cost (SUI)", "Quantity"];
+                investTableArray.push(title);
+                investPieArray.push(title);
                 let investsArray = puddle.puddle.investments.invests;
                 for (let investObj of investsArray) {
                     getPoolDetail(investObj.investsAddress).then(poolDetail => {
                         getCoinMetadata(poolDetail.coinTypeA).then(CoinMetadata => {
-                            let investDetailArray = new Array();
+                            let investTableDetailArray = new Array();
+                            let investPieDetailArray = new Array();
                             let symbol = CoinMetadata.symbol;
                             let deciamls = CoinMetadata.decimals;
-                            let total_supply = Number(poolDetail.coinAmountA) / (10 ** deciamls);
                             let cost_sui = Number(investObj.cost_sui) / (10 ** SUI_DECIMALS);
-                            let balance_amount = Number(investObj.balance_amount) / (10 ** deciamls);
-                            console.log("cost_sui = " + cost_sui);
-                            console.log("balance_amount = " + balance_amount);
-                            investDetailArray.push(symbol, balance_amount, cost_sui, total_supply);
-                            investArray.push(investDetailArray);
+                            let quantity = Number(investObj.balance_amount) / (10 ** deciamls);
+                            let price = sqrtPriceX64ToPrice(poolDetail, deciamls, SUI_DECIMALS);
+                            let rate = (1 / price);
+                            let current_value = rate * quantity;
+                            investTableDetailArray.push(symbol, "$ "+(current_value).toString().substring(0, 10), (rate).toString().substring(0, 10), (cost_sui).toString().substring(0, 10), (quantity).toString().substring(0, 10));
+                            investPieDetailArray.push(symbol, Number(current_value), Number(rate), Number(cost_sui), Number(quantity));
+                            investTableArray.push(investTableDetailArray);
+                            investPieArray.push(investPieDetailArray);
+                            console.log("symbol = "+symbol);
+                            console.log("price = "+price);
+                            console.log("rate = "+rate);
                         });
                     });
                 }
             }
             setYourPuddles(resp);
             setPuddleMap(puddle_map);
-            setInvestMap(investMap);
+            setInvestTableMap(investTableMap);
+            setInvestPieMap(investPieMap);
         });
     });
 
     function changeInvestData(puddleId) {
         if (puddleId === "") {
-            setInvestData([]);
+            setInvestTableData([]);
+            setInvestPieData([]);
         } else {
-            setInvestData(investMap.get(puddleId));
+            setInvestTableData(investTableMap.get(puddleId));
+            setInvestPieData(investPieMap.get(puddleId));
         }
     }
 
@@ -459,23 +474,23 @@ export default function WalletComponent() {
             <div style={DashboardTableStyle}>
                 <h2 style={{ color: 'deepSkyBlue' }}>Dashboard</h2>
                 {
-                    investData.length <= 1 &&
+                    investTableData.length <= 1 &&
                     <Text>No Data</Text>
                 }
                 {
-                    investData.length > 1 &&
+                    investTableData.length > 1 &&
                     <Flex>
                         <Box marginBottom={'20px'}>
                             <Chart
                                 chartType="PieChart"
-                                data={investData}
+                                data={investPieData}
                                 options={pieChartOptions}
                             />
                         </Box>
                         <Box marginBottom={'20px'}>
                             <Chart
                                 chartType="Table"
-                                data={investData}
+                                data={investTableData}
                                 options={tableChartOptions}
                             />
                         </Box>

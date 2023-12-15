@@ -1,5 +1,6 @@
-import { CetusClmmSDK } from "@cetusprotocol/cetus-sui-clmm-sdk"
+import { CetusClmmSDK, TickMath } from "@cetusprotocol/cetus-sui-clmm-sdk"
 import { testnetConnection, JsonRpcProvider, SUI_DECIMALS } from "@mysten/sui.js";
+import {BN} from 'bn.js';
 
 const provider = new JsonRpcProvider(testnetConnection);
 
@@ -118,7 +119,6 @@ export async function getPoolDetail(cetusPoolAddress){
 export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
 
   const poolDetail = await getPoolDetail(cetusPoolAddress);
-  console.log(poolDetail);
 
   let from = isBuy? poolDetail.coinTypeB : poolDetail.coinTypeA;
   let to = isBuy? poolDetail.coinTypeA : poolDetail.coinTypeB;
@@ -146,11 +146,13 @@ export async function getPreSwap(cetusPoolAddress, isBuy, amount) {
 
   let input_amount = Number(amount) * Number(10 ** input_decimals);
 
-  console.log("input_amount = "+input_amount);
-
   const res = await TestnetSDK.RouterV2.getBestRouter(
     from, to, input_amount, byAmountIn, priceSplitPoint, partner, swapWithMultiPoolParams, orderSplit, externalRouter);
 
   let outputAmount = Number(res.result.outputAmount) / Number(10 ** output_decimals) + " " + output_symbol;
   return outputAmount;
+}
+
+export function sqrtPriceX64ToPrice(cetusPool, decimalsA, decimalsB) {
+  return TickMath.sqrtPriceX64ToPrice(new BN(cetusPool.current_sqrt_price), decimalsA, decimalsB);
 }
